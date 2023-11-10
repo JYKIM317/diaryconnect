@@ -9,6 +9,7 @@ import 'Theme/ThemeColor.dart';
 import 'Theme/ThemeLangauge.dart';
 import 'package:diaryconnect/ViewPage/Entries/Entries_view.dart';
 import 'package:diaryconnect/ViewPage/Entries/EntryWrite_model.dart';
+import 'package:diaryconnect/ViewPage/Entries/EntryWrite_view.dart';
 
 String defaultLocale = Platform.localeName;
 final themeColor = StateNotifierProvider<ThemeNotifier, Color>((ref) {
@@ -46,15 +47,17 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: ref.watch(themeColor)),
-          splashColor: Colors.transparent,
-          hoverColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          useMaterial3: true,
-        ),
-        home: const MainPage());
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: ref.watch(themeColor)),
+        splashColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        useMaterial3: true,
+        fontFamily: 'NotoSans',
+      ),
+      home: const MainPage(),
+    );
   }
 }
 
@@ -112,7 +115,28 @@ class _MainPageState extends ConsumerState<MainPage> {
       floatingActionButton: selectedIndex == 0
           ? FloatingActionButton(
               onPressed: () async {
-                Map<String, dynamic> entryData = await makeEntryCase();
+                final DateTime today = DateTime.now();
+                final String thisTime =
+                    '${today.year}.${today.month}.${today.day}_${today.hour}:${today.minute}';
+                final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
+                final String? thisTimeData = prefs.getString(thisTime);
+                if (thisTimeData == null) {
+                  Map<String, dynamic> entryData = await makeEntryCase();
+                  await Future.microtask(
+                    () async => await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EntryWrite(entryData: entryData),
+                      ),
+                    ),
+                  );
+                  setState(() {
+                    Scaffold.of(context);
+                  });
+                } else {
+                  //동일한 시간대 작성한 다이어리가 있을경우 처리할 내용
+                }
               },
               backgroundColor: Theme.of(context).colorScheme.secondary,
               child: Icon(

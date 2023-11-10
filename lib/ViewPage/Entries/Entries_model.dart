@@ -29,19 +29,44 @@ Future<List<Map<String, dynamic>>> getEntries() async {
     String yearKey = thisYear.toString();
     List<String>? monthList = prefs.getStringList(yearKey);
     if (monthList != null) {
-      monthList.reversed;
+      monthList = monthList.reversed.toList();
       //해당 년도에 해당 월에 작성 된 data가 있으면 정확한 날짜 get
       for (String monthIndex in monthList) {
         String monthKey = monthIndex;
         List<String>? dayList = prefs.getStringList(monthKey);
         if (dayList != null) {
-          dayList.reversed;
+          dayList = dayList.reversed.toList();
           //정확한 날짜명 (key 값)으로 entry 내용 확인 후 map타입으로 변환해서 list로 저장
           for (String dayIndex in dayList) {
             String dayKey = dayIndex;
             String? entry = prefs.getString(dayKey);
             if (entry != null) {
               Map<String, dynamic> entriesData = jsonDecode(entry);
+
+              //첫번째 엔트리 앞에 date flag 생성
+              if (myEntries.isEmpty) {
+                DateTime firstDataDate = DateTime.parse(entriesData['date']);
+                Map<String, dynamic> flagData = {
+                  'date': firstDataDate,
+                  'monthFlag': firstDataDate.month.toString(),
+                  'yearFlag': firstDataDate.year.toString(),
+                };
+                myEntries.add(flagData);
+              } else {
+                //첫번째 엔트리 앞을 제외한 나머지 엔트리에서 전 엔트리와 비교해 month가 다를 경우 date flag 생성
+                DateTime beforeDataDate =
+                    DateTime.parse(myEntries.last['date']);
+                DateTime currentDataDate = DateTime.parse(entriesData['date']);
+                if (beforeDataDate.month != currentDataDate.month) {
+                  Map<String, dynamic> flagData = {
+                    'date': currentDataDate,
+                    'monthFlag': currentDataDate.month.toString(),
+                    'yearFlag': currentDataDate.year.toString(),
+                  };
+                  myEntries.add(flagData);
+                }
+              }
+              //엔트리 add
               myEntries.add(entriesData);
             }
           }
@@ -98,7 +123,7 @@ IconData moodIconData(String mood) {
       loadIconData = CustomIcon.emo_cry;
       break;
     default:
-      loadIconData = CustomIcon.sun;
+      loadIconData = CustomIcon.emo_happy;
   }
   return loadIconData;
 }

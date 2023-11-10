@@ -1,43 +1,60 @@
-import 'dart:convert';
 import 'package:diaryconnect/CustomIcon.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_indicator/loading_indicator.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 import 'Entries_model.dart';
+import 'package:diaryconnect/ViewPage/Entries/EntryWrite_view.dart';
 
-class EntriesPage extends StatefulWidget {
+class EntriesPage extends ConsumerStatefulWidget {
   const EntriesPage({super.key});
 
   @override
-  State<EntriesPage> createState() => _EntriesPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _EntriesPageState();
 }
 
-class _EntriesPageState extends State<EntriesPage> {
+class _EntriesPageState extends ConsumerState<EntriesPage> {
+  late ScrollController scrollController;
+
+  @override
+  void initState() {
+    scrollController = ScrollController();
+    scrollController.addListener(() {
+      scrollController.hasClients;
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       height: double.infinity,
       color: Theme.of(context).colorScheme.primaryContainer,
-      padding: EdgeInsets.fromLTRB(10.w, 24.h, 10.w, 0),
+      padding: EdgeInsets.only(top: 47.h),
       child: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
         child: FutureBuilder(
           //Get Entries Data from Entries_model
           future: getEntries(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return LoadingIndicator(
+              return Text('');
+              /*return LoadingIndicator(
                 indicatorType: Indicator.pacman,
                 colors: [Theme.of(context).colorScheme.onPrimary],
                 strokeWidth: 2,
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 pathBackgroundColor: Theme.of(context).colorScheme.primary,
-              );
+              );*/
             }
-            List<Map<String, dynamic>> myEntries = snapshot.data;
+            List<Map<String, dynamic>> myEntries = snapshot.data.toList();
             if (myEntries.isEmpty) {
               return Center(
                 heightFactor: 6,
@@ -55,11 +72,42 @@ class _EntriesPageState extends State<EntriesPage> {
             //Entries Page show widget
             return ListView.separated(
               physics: const BouncingScrollPhysics(),
+              controller: scrollController,
               shrinkWrap: true,
               itemCount: myEntries.length,
               itemBuilder: (BuildContext context, int index) {
                 Map<String, dynamic> thisEntry = myEntries[index];
                 bool imageExist = false;
+
+                //current index가 date flag인 경우 return
+                if (thisEntry['monthFlag'] != null) {
+                  return SizedBox(
+                    height: 200.h,
+                    width: double.infinity,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${thisEntry['yearFlag']}.',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
+                              fontSize: 18.sp,
+                            ),
+                          ),
+                          Text(
+                            thisEntry['monthFlag'],
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
+                              fontSize: 80.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
 
                 final IconData weather = weatherIconData(thisEntry['weather']);
                 final IconData mood = moodIconData(thisEntry['mood']);
@@ -80,96 +128,152 @@ class _EntriesPageState extends State<EntriesPage> {
                   'image': image,
                 };
 
-                return Container(
-                  width: double.infinity,
-                  height: 160.h,
-                  padding: EdgeInsets.fromLTRB(10.w, 19.h, 10.w, 19.h),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6.sp),
-                      color: Colors.white),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Column(
-                            children: [
-                              //일
-                              Text(
-                                '${date.day}',
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
-                              ),
-                              //요일
-                              Text(
-                                '$dayOfWeek',
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        flex: 2,
+                return InkWell(
+                  onTap: () async {
+                    double lastScrollOffset = scrollController.offset /
+                        scrollController.position.maxScrollExtent;
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EntryWrite(entryData: entryData),
                       ),
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.topLeft,
-                          child: Column(
-                            children: [
-                              //시간
-                              Text(
-                                '${date.hour}:${date.minute}',
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
-                              ),
-                              //내용
-                              Text(
-                                '$detail',
-                                style: TextStyle(color: Colors.black54),
-                              ),
-                            ],
-                          ),
-                        ),
-                        flex: 5,
-                      ),
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.topCenter,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
+                    );
+                    setState(() {});
+                    scrollController.animateTo(
+                      lastScrollOffset *
+                          scrollController.position.maxScrollExtent,
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: Padding(
+                    //entry side padding
+                    padding: EdgeInsets.symmetric(horizontal: 10.w),
+                    child: Container(
+                      width: double.infinity,
+                      height: 140.h,
+                      padding: EdgeInsets.fromLTRB(10.w, 19.h, 10.w, 19.h),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12.sp),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 12.sp,
+                                offset: Offset(8.w, 10.h)),
+                          ]),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  //날씨
-                                  Icon(
-                                    weather,
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
+                                  //일
+                                  Text(
+                                    '${date.day}',
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      fontSize: 42.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
-                                  //기분
-                                  Icon(
-                                    mood,
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
+                                  //요일
+                                  Text(
+                                    '$dayOfWeek.',
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      fontSize: 14.sp,
+                                    ),
                                   ),
                                 ],
                               ),
-                              //사진 있을 시 파일
-                              if (imageExist) Icon(CustomIcon.attach),
-                            ],
+                            ),
                           ),
-                        ),
-                        flex: 3,
+                          Expanded(
+                            flex: 5,
+                            child: Container(
+                              alignment: Alignment.topLeft,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  //시간
+                                  Text(
+                                    '${date.hour}:${date.minute < 10 ? 0.toString() + date.minute.toString() : date.minute}',
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      fontSize: 12.sp,
+                                    ),
+                                  ),
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      minHeight: 70.h,
+                                    ),
+                                    child: Text(
+                                      detail,
+                                      style: TextStyle(
+                                        color: Colors.black54,
+                                        fontSize: 16.sp,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  )
+                                  //내용
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Container(
+                              alignment: Alignment.topCenter,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      //날씨
+                                      Icon(
+                                        weather,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        size: 28.sp,
+                                      ),
+                                      //기분
+                                      Icon(
+                                        mood,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        size: 18.sp,
+                                      ),
+                                    ],
+                                  ),
+                                  //사진 있을 시 파일
+                                  if (imageExist) Icon(CustomIcon.attach),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 );
               },

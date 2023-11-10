@@ -41,6 +41,8 @@ dependencies:
   permission_handler: ^11.0.1
   loading_indicator: ^3.1.1
   intl: ^0.18.1
+  flutter_progress_hud: ^2.0.2
+  bottom_drawer: ^0.0.5
 
 dev_dependencies:
   flutter_test:
@@ -84,6 +86,9 @@ flutter:
     - family: CustomIcon
       fonts:
         - asset: assets/fonts/CustomIcon.ttf
+    - family: NotoSans
+      fonts:
+        - asset: assets/fonts/NotoSansKR-Regular.ttf
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
