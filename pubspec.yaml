@@ -41,8 +41,9 @@ dependencies:
   permission_handler: ^11.0.1
   loading_indicator: ^3.1.1
   intl: ^0.18.1
-  flutter_progress_hud: ^2.0.2
   bottom_drawer: ^0.0.5
+  image_picker: ^1.0.4
+  image_cropper: ^5.0.0
 
 dev_dependencies:
   flutter_test:

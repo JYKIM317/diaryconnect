@@ -84,7 +84,7 @@ class _MainPageState extends ConsumerState<MainPage> {
   Widget build(BuildContext context) {
     final lang = ref.watch(themeLang);
     return Scaffold(
-      body: const [
+      body: [
         EntriesPage(),
         EntriesPage(),
         EntriesPage(),
@@ -131,9 +131,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                       ),
                     ),
                   );
-                  setState(() {
-                    Scaffold.of(context);
-                  });
+                  setState(() {});
                 } else {
                   //동일한 시간대 작성한 다이어리가 있을경우 처리할 내용
                 }

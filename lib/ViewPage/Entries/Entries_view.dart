@@ -15,13 +15,14 @@ class EntriesPage extends ConsumerStatefulWidget {
 }
 
 class _EntriesPageState extends ConsumerState<EntriesPage> {
-  late ScrollController scrollController;
+  ScrollController scrollController = ScrollController();
+  late double lastScrollOffset;
+  onScroll() {}
 
   @override
   void initState() {
-    scrollController = ScrollController();
     scrollController.addListener(() {
-      scrollController.hasClients;
+      onScroll();
     });
     super.initState();
   }
@@ -40,6 +41,7 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
       color: Theme.of(context).colorScheme.primaryContainer,
       padding: EdgeInsets.only(top: 47.h),
       child: SingleChildScrollView(
+        controller: scrollController,
         child: FutureBuilder(
           //Get Entries Data from Entries_model
           future: getEntries(),
@@ -72,7 +74,6 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
             //Entries Page show widget
             return ListView.separated(
               physics: const BouncingScrollPhysics(),
-              controller: scrollController,
               shrinkWrap: true,
               itemCount: myEntries.length,
               itemBuilder: (BuildContext context, int index) {
@@ -130,8 +131,7 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
 
                 return InkWell(
                   onTap: () async {
-                    double lastScrollOffset = scrollController.offset /
-                        scrollController.position.maxScrollExtent;
+                    lastScrollOffset = scrollController.offset - 1;
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -140,9 +140,8 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
                     );
                     setState(() {});
                     scrollController.animateTo(
-                      lastScrollOffset *
-                          scrollController.position.maxScrollExtent,
-                      duration: Duration(milliseconds: 500),
+                      lastScrollOffset,
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                     );
                   },
@@ -242,6 +241,7 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Row(
                                     mainAxisAlignment:
@@ -266,7 +266,18 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
                                     ],
                                   ),
                                   //사진 있을 시 파일
-                                  if (imageExist) Icon(CustomIcon.attach),
+                                  if (imageExist)
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 0, 12.w, 6.h),
+                                      child: Icon(
+                                        CustomIcon.attach,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        size: 24.sp,
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),

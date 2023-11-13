@@ -47,5 +47,8 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+    <!--Photo library permission-->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To upload photos to the diary, access permissions are required. The photos you upload will be stored in the internal storage and can be deleted or modified at any time.</string>
 </dict>
 </plist>

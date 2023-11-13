@@ -1,9 +1,9 @@
-import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bottom_drawer/bottom_drawer.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'EntryWrite_model.dart';
 import 'package:diaryconnect/main.dart';
@@ -32,7 +32,6 @@ import 'package:diaryconnect/imoticon.dart';
     'image': resImage, //String
   }
 */
-//Image image = Image.memory(base64Decode(thisEntry['image']));
 
 /// create a bottom drawer controller to control the drawer.
 
@@ -50,7 +49,7 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
   late String detail, dayOfWeek, image;
   final TextEditingController editingController = TextEditingController();
 
-  OverlayEntry? _overlayEntry;
+  OverlayEntry? overlayEntry;
   final LayerLink weatherlayerLink = LayerLink();
   final LayerLink moodlayerLink = LayerLink();
 
@@ -59,6 +58,8 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
 
   BottomDrawerController imoController = BottomDrawerController();
   Map<String, String> emoIndex = emoticon().emo1;
+
+  ScrollController scrollController = ScrollController();
 
   //imoticon bottom Drawer
   Widget imoticonDrawer(BuildContext context) {
@@ -122,11 +123,14 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                 );
               },
               separatorBuilder: (context, index) {
-                return Container(
-                  alignment: Alignment.center,
-                  height: 10.h,
-                  width: 1.w,
-                  //color: Colors.black,
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20.h),
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 10.h,
+                    width: 1.w,
+                    color: Colors.black45,
+                  ),
                 );
               },
               itemCount: emoList.length,
@@ -143,24 +147,13 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                   onPressed: () async {
                     detail = '$detail ${emoIndex['${index + 1}']}';
                     editingController.text = detail;
-
-                    final SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    final String weatherString = weatherToString(weather);
-                    final String moodString = moodToString(mood);
-                    final String dateString = date.toString();
-                    final String entryName =
-                        '${date.year}.${date.month}.${date.day}_${date.hour}:${date.minute}';
-                    Map<String, dynamic> responseData = {
-                      'weather': weatherString, //String
-                      'mood': moodString, //String
-                      'date': dateString, //String
-                      'detail': detail, //String
-                      'image': image, //String
-                    };
-                    final String entryData = jsonEncode(responseData);
-                    await prefs.setString(entryName, entryData);
-
+                    //데이터 저장
+                    await entrySave(
+                        weather: weather,
+                        mood: mood,
+                        date: date,
+                        detail: detail,
+                        image: image);
                     setState(() {});
                     imoController.close();
                   },
@@ -184,9 +177,9 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
   }
 
   void weatherDropdown() {
-    if (_overlayEntry == null) {
-      _overlayEntry = weatherOverlay();
-      Overlay.of(context).insert(_overlayEntry!);
+    if (overlayEntry == null) {
+      overlayEntry = weatherOverlay();
+      Overlay.of(context).insert(overlayEntry!);
     }
   }
 
@@ -223,24 +216,13 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                   return IconButton(
                       onPressed: () async {
                         weather = weatherList.elementAt(index);
-
-                        final SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
-                        final String weatherString = weatherToString(weather);
-                        final String moodString = moodToString(mood);
-                        final String dateString = date.toString();
-                        final String entryName =
-                            '${date.year}.${date.month}.${date.day}_${date.hour}:${date.minute}';
-                        Map<String, dynamic> responseData = {
-                          'weather': weatherString, //String
-                          'mood': moodString, //String
-                          'date': dateString, //String
-                          'detail': detail, //String
-                          'image': image, //String
-                        };
-                        final String entryData = jsonEncode(responseData);
-                        await prefs.setString(entryName, entryData);
-
+                        //데이터 저장
+                        await entrySave(
+                            weather: weather,
+                            mood: mood,
+                            date: date,
+                            detail: detail,
+                            image: image);
                         setState(() {});
                         _removeOverlay();
                       },
@@ -268,9 +250,9 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
   }
 
   void moodDropdown() {
-    if (_overlayEntry == null) {
-      _overlayEntry = moodOverlay();
-      Overlay.of(context).insert(_overlayEntry!);
+    if (overlayEntry == null) {
+      overlayEntry = moodOverlay();
+      Overlay.of(context).insert(overlayEntry!);
     }
   }
 
@@ -308,24 +290,13 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                   return IconButton(
                       onPressed: () async {
                         mood = moodList.elementAt(index);
-
-                        final SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
-                        final String weatherString = weatherToString(weather);
-                        final String moodString = moodToString(mood);
-                        final String dateString = date.toString();
-                        final String entryName =
-                            '${date.year}.${date.month}.${date.day}_${date.hour}:${date.minute}';
-                        Map<String, dynamic> responseData = {
-                          'weather': weatherString, //String
-                          'mood': moodString, //String
-                          'date': dateString, //String
-                          'detail': detail, //String
-                          'image': image, //String
-                        };
-                        final String entryData = jsonEncode(responseData);
-                        await prefs.setString(entryName, entryData);
-
+                        //데이터 저장
+                        await entrySave(
+                            weather: weather,
+                            mood: mood,
+                            date: date,
+                            detail: detail,
+                            image: image);
                         setState(() {});
                         _removeOverlay();
                       },
@@ -353,8 +324,24 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
   }
 
   void _removeOverlay() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+    overlayEntry?.remove();
+    overlayEntry = null;
+  }
+
+  double scrolloffset = 0.0;
+  bool isDateShow = true;
+  void onScroll() {
+    if (scrolloffset == 0.0 && scrollController.offset != 0.0) {
+      setState(() {
+        isDateShow = false;
+        scrolloffset = scrollController.offset;
+      });
+    } else if (scrolloffset >= 0.1 && scrollController.offset == 0.0) {
+      setState(() {
+        isDateShow = true;
+        scrolloffset = scrollController.offset;
+      });
+    }
   }
 
   @override
@@ -367,12 +354,16 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
     dayOfWeek = widget.entryData['dayOfWeek'];
     image = widget.entryData['image'];
     editingController.text = detail;
+    scrollController.addListener(() {
+      onScroll();
+    });
     super.initState();
   }
 
   @override
   void dispose() {
-    _overlayEntry?.remove();
+    overlayEntry?.remove();
+    scrollController.dispose();
     super.dispose();
   }
 
@@ -388,6 +379,7 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
       child: Stack(
         children: [
           Scaffold(
+            resizeToAvoidBottomInset: true,
             appBar: AppBar(
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               leading: Padding(
@@ -443,7 +435,6 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                                       }),
                                 ]);
                           });
-
                       // delete Entry.. EntryWrite_model logic
                     },
                     icon: Icon(
@@ -454,48 +445,62 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                   ),
                 )
               ],
+              title: Text(
+                '${date.year}.${date.month}.${date.day} $dayOfWeek. ${date.hour}:${date.minute}',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
+                  fontSize: isDateShow ? 0 : 18.sp,
+                ),
+              ),
+              centerTitle: true,
             ),
             body: SingleChildScrollView(
+              controller: scrollController,
               physics: const ClampingScrollPhysics(),
               child: Column(
                 children: [
-                  Container(
+                  //scroll offset 0.0 date Container
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 100),
                     color: Theme.of(context).colorScheme.primaryContainer,
                     width: double.infinity,
-                    height: 240.h,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          '${date.year}.${date.month}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontSize: 18.sp,
+                    height: isDateShow ? 240.h : 0,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${date.year}.${date.month}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
+                              fontSize: 18.sp,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '${date.day}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontSize: 78.sp,
-                            fontWeight: FontWeight.w700,
+                          Text(
+                            '${date.day}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
+                              fontSize: 78.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '${dayOfWeek}. ${date.hour}:${date.minute}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontSize: 14.sp,
+                          Text(
+                            '$dayOfWeek. ${date.hour}:${date.minute}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
+                              fontSize: 14.sp,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
+                  //weather, mood overlay button
                   Container(
                     alignment: Alignment.centerRight,
                     width: double.infinity,
-                    padding: EdgeInsets.fromLTRB(0, 10.h, 10.w, 0),
+                    padding: EdgeInsets.fromLTRB(0, 24.h, 10.w, 0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -554,11 +559,13 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                       ],
                     ),
                   ),
+                  //detail text
                   Container(
                     padding: EdgeInsets.fromLTRB(28.w, 24.h, 28.w, 24.h),
                     child: TextField(
                       controller: editingController,
-                      minLines: 14,
+                      //이미지가 있으면 textfield minline 5 else 20
+                      minLines: image == 'null' ? 20 : 5,
                       maxLines: null,
                       decoration: const InputDecoration(
                         enabledBorder: InputBorder.none,
@@ -566,26 +573,75 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                       ),
                       onChanged: (value) async {
                         detail = value;
-
-                        final SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
-                        final String weatherString = weatherToString(weather);
-                        final String moodString = moodToString(mood);
-                        final String dateString = date.toString();
-                        final String entryName =
-                            '${date.year}.${date.month}.${date.day}_${date.hour}:${date.minute}';
-                        Map<String, dynamic> responseData = {
-                          'weather': weatherString, //String
-                          'mood': moodString, //String
-                          'date': dateString, //String
-                          'detail': detail, //String
-                          'image': image, //String
-                        };
-                        final String entryData = jsonEncode(responseData);
-                        await prefs.setString(entryName, entryData);
+                        //데이터 저장
+                        await entrySave(
+                            weather: weather,
+                            mood: mood,
+                            date: date,
+                            detail: detail,
+                            image: image);
                       },
                     ),
                   ),
+                  if (image != 'null')
+                    Container(
+                      padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 10.h),
+                      child: Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          Image.file(File(image)),
+                          IconButton(
+                              onPressed: () async {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(6.sp)),
+                                          content: Text(
+                                            lang.cautionDelete,
+                                            style: TextStyle(fontSize: 18.sp),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                                child: Text(lang.cancel,
+                                                    style: TextStyle(
+                                                      color: Colors.grey,
+                                                      fontSize: 14.sp,
+                                                    )),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                }),
+                                            TextButton(
+                                                child: Text(lang.delete,
+                                                    style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontSize: 14.sp,
+                                                    )),
+                                                onPressed: () async {
+                                                  image = 'null';
+                                                  await entrySave(
+                                                      weather: weather,
+                                                      mood: mood,
+                                                      date: date,
+                                                      detail: detail,
+                                                      image: image);
+                                                  setState(() {});
+                                                  await Future.microtask(() =>
+                                                      Navigator.pop(context));
+                                                }),
+                                          ]);
+                                    });
+                              },
+                              icon: Icon(
+                                Icons.highlight_off,
+                                size: 28.sp,
+                                color: Colors.black45,
+                              ))
+                        ],
+                      ),
+                    )
                 ],
               ),
             ),
@@ -598,7 +654,19 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final String pickedImage = await getImage();
+                      if (pickedImage != 'null') {
+                        image = pickedImage;
+                        await entrySave(
+                            weather: weather,
+                            mood: mood,
+                            date: date,
+                            detail: detail,
+                            image: image);
+                        setState(() {});
+                      }
+                    },
                     icon: Icon(
                       Icons.image,
                       color: Theme.of(context).colorScheme.secondary,

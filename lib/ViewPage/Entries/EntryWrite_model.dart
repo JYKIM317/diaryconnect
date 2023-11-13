@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 import 'Entries_model.dart';
 import 'package:diaryconnect/CustomIcon.dart';
@@ -162,4 +164,49 @@ String moodToString(IconData moodIcon) {
       break;
   }
   return moodToString;
+}
+
+Future<void> entrySave({
+  required IconData weather,
+  required IconData mood,
+  required DateTime date,
+  required String detail,
+  required String image,
+}) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String weatherString = weatherToString(weather);
+  final String moodString = moodToString(mood);
+  final String dateString = date.toString();
+  final String entryName =
+      '${date.year}.${date.month}.${date.day}_${date.hour}:${date.minute}';
+  Map<String, dynamic> responseData = {
+    'weather': weatherString, //String
+    'mood': moodString, //String
+    'date': dateString, //String
+    'detail': detail, //String
+    'image': image, //String
+  };
+  final String entryData = jsonEncode(responseData);
+  await prefs.setString(entryName, entryData);
+}
+
+Future<String> getImage() async {
+  String image = 'null';
+  XFile? pickedImage;
+  final ImagePicker picker = ImagePicker();
+  pickedImage = await picker.pickImage(source: ImageSource.gallery);
+  if (pickedImage != null) {
+    image = pickedImage.path;
+    CroppedFile? croppedImage =
+        await ImageCropper().cropImage(sourcePath: image);
+    if (croppedImage != null) {
+      image = croppedImage.path;
+    } else {
+      image = 'null';
+    }
+  } else {
+    image = 'null';
+  }
+
+  return image;
 }
