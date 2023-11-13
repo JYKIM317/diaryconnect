@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -200,7 +201,9 @@ Future<String> getImage() async {
     CroppedFile? croppedImage =
         await ImageCropper().cropImage(sourcePath: image);
     if (croppedImage != null) {
-      image = croppedImage.path;
+      List<int> imageBytes = await File(croppedImage.path).readAsBytesSync();
+      String base64Image = base64Encode(imageBytes);
+      image = base64Image;
     } else {
       image = 'null';
     }

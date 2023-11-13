@@ -141,7 +141,7 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
                     setState(() {});
                     scrollController.animateTo(
                       lastScrollOffset,
-                      duration: const Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 10),
                       curve: Curves.easeInOut,
                     );
                   },

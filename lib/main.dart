@@ -10,6 +10,7 @@ import 'Theme/ThemeLangauge.dart';
 import 'package:diaryconnect/ViewPage/Entries/Entries_view.dart';
 import 'package:diaryconnect/ViewPage/Entries/EntryWrite_model.dart';
 import 'package:diaryconnect/ViewPage/Entries/EntryWrite_view.dart';
+import 'package:diaryconnect/ViewPage/Calendar/Calendar_view.dart';
 
 String defaultLocale = Platform.localeName;
 final themeColor = StateNotifierProvider<ThemeNotifier, Color>((ref) {
@@ -86,7 +87,7 @@ class _MainPageState extends ConsumerState<MainPage> {
     return Scaffold(
       body: [
         EntriesPage(),
-        EntriesPage(),
+        CalendarPage(),
         EntriesPage(),
       ][selectedIndex],
       bottomNavigationBar: BottomNavigationBar(

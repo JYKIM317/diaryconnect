@@ -1,9 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bottom_drawer/bottom_drawer.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import 'EntryWrite_model.dart';
 import 'package:diaryconnect/main.dart';
@@ -589,7 +589,7 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                       child: Stack(
                         alignment: Alignment.topRight,
                         children: [
-                          Image.file(File(image)),
+                          Image.memory(base64Decode(image)),
                           IconButton(
                               onPressed: () async {
                                 showDialog(
