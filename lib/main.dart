@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'Theme/ThemeColor.dart';
 import 'Theme/ThemeLangauge.dart';
@@ -11,6 +12,7 @@ import 'package:diaryconnect/ViewPage/Entries/Entries_view.dart';
 import 'package:diaryconnect/ViewPage/Entries/EntryWrite_model.dart';
 import 'package:diaryconnect/ViewPage/Entries/EntryWrite_view.dart';
 import 'package:diaryconnect/ViewPage/Calendar/Calendar_view.dart';
+import 'package:diaryconnect/ViewPage/shared/Shared_view.dart';
 
 String defaultLocale = Platform.localeName;
 final themeColor = StateNotifierProvider<ThemeNotifier, Color>((ref) {
@@ -25,6 +27,8 @@ void main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final bool? firstLogin = prefs.getBool('firstLogin');
+  //Calendar locale init initialize
+  await initializeDateFormatting();
   if (firstLogin == null) {
     int thisYear = DateTime.now().year;
     await prefs.setString('langauge', defaultLocale);
@@ -88,7 +92,7 @@ class _MainPageState extends ConsumerState<MainPage> {
       body: [
         EntriesPage(),
         CalendarPage(),
-        EntriesPage(),
+        SharedPage(),
       ][selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
@@ -113,6 +117,7 @@ class _MainPageState extends ConsumerState<MainPage> {
         showUnselectedLabels: false,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
       ),
+      //only Entries and Calendar (without Shared)
       floatingActionButton: selectedIndex == 0
           ? FloatingActionButton(
               onPressed: () async {
@@ -141,6 +146,7 @@ class _MainPageState extends ConsumerState<MainPage> {
               child: Icon(
                 Icons.border_color_rounded,
                 color: Theme.of(context).colorScheme.onSecondary,
+                size: 24.sp,
               ),
             )
           : null,

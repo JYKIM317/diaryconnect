@@ -47,14 +47,7 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
           future: getEntries(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text('');
-              /*return LoadingIndicator(
-                indicatorType: Indicator.pacman,
-                colors: [Theme.of(context).colorScheme.onPrimary],
-                strokeWidth: 2,
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                pathBackgroundColor: Theme.of(context).colorScheme.primary,
-              );*/
+              return const Text('');
             }
             List<Map<String, dynamic>> myEntries = snapshot.data.toList();
             if (myEntries.isEmpty) {

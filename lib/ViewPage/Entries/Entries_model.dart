@@ -6,14 +6,14 @@ import 'package:diaryconnect/CustomIcon.dart';
 
 /*
   Data roles //key:value
-  <String>year(ex: 2023) : <List<String>>['2023.09','2023.10'] //yearKey : monthKey
-  <String>year.month(ex: 2023.09) : <List<String>>['2023.09.01_11:24','2023.09.10_09:53'] //monthKey : dayKey
-  <String>year.month.day(ex: 2023.09.01_11:24) : <Map<String, dynamic>>{key:value} //dayKey : entry
+  <String>year(ex: 2023) : <List<String>>['2023.9','2023.10'] //yearKey : monthKey
+  <String>year.month(ex: 2023.9) : <List<String>>['2023.9.1_14:24','2023.9.10_9:53'] //monthKey : dayKey
+  <String>year.month.day_time(ex: 2023.9.1_14:24) : <Map<String, dynamic>>{key:value} //dayKey : entry
 
   <Map<String, dynamic>>entry {
     'weather' : 'sun' // etc) rain, clouds, cloud_sun, snow, 
     'mood' : 'good' // etc) not_bad, bad, suprised, angry, cry
-    'date' : '2023-11-08 00:30:28' //DateTime.now().toString()
+    'date' : '2023.11.8 0:30:28' //DateTime.now().toString()
     'detail' : 'brr brr~ brr' 
     'image' : 'base64Encode data' //String base64Image = base64Encode(imageBytes) / int8List bytes = base64Decode(prefs.getString("image"));
   }

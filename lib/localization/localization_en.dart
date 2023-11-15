@@ -5,4 +5,6 @@ class USLang {
   String delete = 'Delete';
   String cancel = 'Cancel';
   String cautionDelete = 'Would you like to delete it?';
+  String addEvent = 'Add event';
+  String noEvent = 'No event';
 }

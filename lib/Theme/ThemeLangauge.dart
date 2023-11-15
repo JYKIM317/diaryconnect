@@ -13,7 +13,7 @@ ja_JP : Japan
 
 defaultLang() {
   String defaultLocale = Platform.localeName;
-  late var lang;
+  var lang;
   switch (defaultLocale) {
     case 'ko_KR':
       lang = KRLang();
@@ -49,4 +49,23 @@ class LangNotifier extends StateNotifier<dynamic> {
     await prefs.setString('langauge', 'ja_JP');
     state = JPLang();
   }
+}
+
+String getLangagueCode(var lang) {
+  String langauge;
+  switch (lang) {
+    case KRLang():
+      langauge = 'ko_KR';
+      break;
+    case USLang():
+      langauge = 'en_US';
+      break;
+    case JPLang():
+      langauge = 'ja_JP';
+      break;
+    default:
+      langauge = Platform.localeName;
+      break;
+  }
+  return langauge;
 }
