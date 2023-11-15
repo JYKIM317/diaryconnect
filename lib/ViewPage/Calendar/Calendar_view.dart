@@ -6,6 +6,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:diaryconnect/main.dart';
 import 'package:diaryconnect/Theme/ThemeLangauge.dart';
 import 'Calendar_model.dart';
+import 'AddEvent_view.dart';
 
 class CalendarPage extends ConsumerStatefulWidget {
   const CalendarPage({super.key});
@@ -45,12 +46,13 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
           //Calendar
           FutureBuilder(
               future: getEventCount(),
+              initialData: const {
+                //event initial data no reason
+                'initialData': ['initialData'],
+              },
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 //load EventList
-                Map<String, List<dynamic>>? eventDataLoad = snapshot.data;
-                if (eventDataLoad == null) {
-                  return const Text('');
-                }
+                Map<String, List<dynamic>> eventDataLoad = snapshot.data;
                 //실제 Calendar 부분
                 return TableCalendar(
                   focusedDay: _focusedDay,
@@ -113,7 +115,16 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.only(left: 10.w),
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddEventPage(
+                      date: _selectedDay,
+                    ),
+                  ),
+                );
+              },
               icon: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
