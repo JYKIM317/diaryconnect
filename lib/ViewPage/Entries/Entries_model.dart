@@ -23,7 +23,13 @@ Future<List<Map<String, dynamic>>> getEntries() async {
   List<Map<String, dynamic>> myEntries = [];
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   int thisYear = DateTime.now().year.toInt();
-  int firstLoginYear = prefs.getInt('firstLoginYear') ?? thisYear;
+  int? firstLoginYear = prefs.getInt('firstLoginYear');
+
+  if (firstLoginYear == null) {
+    firstLoginYear = thisYear;
+    await prefs.setInt('firstLoginYear', thisYear);
+  }
+
   //thisYear부터 firstLoginYear까지 감소하는 for문
   for (thisYear; thisYear >= firstLoginYear; thisYear--) {
     String yearKey = thisYear.toString();
