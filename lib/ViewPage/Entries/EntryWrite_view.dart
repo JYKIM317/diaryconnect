@@ -407,7 +407,7 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(6.sp)),
                                 content: Text(
-                                  "${date.year}.${date.month}.${date.day} ${date.hour}:${date.minute < 10 ? 0.toString() + date.minute.toString() : date.minute}\n${lang.cautionDelete}",
+                                  "${date.year}.${date.month}.${date.day} ${date.hour}:${date.minute.toString().padLeft(2, '0')}\n${lang.cautionDelete}",
                                   style: TextStyle(fontSize: 18.sp),
                                 ),
                                 actions: [

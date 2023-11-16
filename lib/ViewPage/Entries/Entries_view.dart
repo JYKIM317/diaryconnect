@@ -146,14 +146,16 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
                       height: 140.h,
                       padding: EdgeInsets.fromLTRB(10.w, 19.h, 10.w, 19.h),
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.sp),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 12.sp,
-                                offset: Offset(8.w, 10.h)),
-                          ]),
+                        borderRadius: BorderRadius.circular(12.sp),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 12.sp,
+                            offset: Offset(8.w, 10.h),
+                          ),
+                        ],
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -200,7 +202,7 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
                                 children: [
                                   //시간
                                   Text(
-                                    '${date.hour}:${date.minute < 10 ? 0.toString() + date.minute.toString() : date.minute}',
+                                    '${date.hour}:${date.minute.toString().padLeft(2, '0')}',
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
