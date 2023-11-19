@@ -3,24 +3,36 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:diaryconnect/main.dart';
-import 'AddEvent_model.dart';
+import 'EditEvent_model.dart';
 
-class AddEventPage extends ConsumerStatefulWidget {
+class EditEventPage extends ConsumerStatefulWidget {
   final DateTime date;
-  const AddEventPage({super.key, required this.date});
+  final String detail;
+  const EditEventPage({super.key, required this.date, required this.detail});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _AddEventPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _EditEventPageState();
 }
 
-class _AddEventPageState extends ConsumerState<AddEventPage> {
-  DateTime? selectedDate;
-  int hour = 12, minute = 30;
-  String detail = '';
+class _EditEventPageState extends ConsumerState<EditEventPage> {
+  late DateTime selectedDate;
+  late int hour, minute;
+  late String detail;
   TextEditingController eventDetailController = TextEditingController();
+  bool editState = false;
+
+  int? changeHour, changeMinute;
+  String? changeDetail;
+
   @override
   void initState() {
     selectedDate = widget.date;
+    detail = widget.detail;
+    hour = selectedDate.hour;
+    minute = selectedDate.minute;
+    changeHour = hour;
+    changeMinute = minute;
+    eventDetailController.text = detail;
     super.initState();
   }
 
@@ -82,6 +94,7 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                           Expanded(
                             child: TextField(
                               controller: eventDetailController,
+                              readOnly: !editState,
                               minLines: 3,
                               maxLines: null,
                               style: TextStyle(
@@ -93,7 +106,7 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                                 focusedBorder: InputBorder.none,
                               ),
                               onChanged: (value) {
-                                detail = value;
+                                changeDetail = value;
                               },
                             ),
                           ),
@@ -132,18 +145,22 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                             child: PageView.builder(
                               scrollDirection: Axis.vertical,
                               controller: PageController(
-                                  initialPage: hour, viewportFraction: 0.3),
+                                  initialPage: changeHour!,
+                                  viewportFraction: 0.3),
                               pageSnapping: true,
+                              physics: editState
+                                  ? const ClampingScrollPhysics()
+                                  : const NeverScrollableScrollPhysics(),
                               onPageChanged: (int index) => setState(() {
                                 int numberIndex;
                                 numberIndex = index ~/ 24;
-                                hour = index - numberIndex * 24;
+                                changeHour = index - numberIndex * 24;
                               }),
                               itemBuilder: (BuildContext context, int index) {
                                 int numberIndex;
                                 numberIndex = index ~/ 24;
                                 return Transform.scale(
-                                  scale: index - numberIndex * 24 == hour
+                                  scale: index - numberIndex * 24 == changeHour
                                       ? 1.4
                                       : 0.7,
                                   child: SizedBox(
@@ -156,7 +173,8 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                                               .padLeft(2, '0'),
                                           style: TextStyle(
                                             color:
-                                                index - numberIndex * 24 == hour
+                                                index - numberIndex * 24 ==
+                                                        changeHour
                                                     ? Theme.of(context)
                                                         .colorScheme
                                                         .secondary
@@ -187,20 +205,25 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                             child: PageView.builder(
                               scrollDirection: Axis.vertical,
                               controller: PageController(
-                                  initialPage: minute, viewportFraction: 0.3),
+                                  initialPage: changeMinute!,
+                                  viewportFraction: 0.3),
                               pageSnapping: true,
+                              physics: editState
+                                  ? const ClampingScrollPhysics()
+                                  : const NeverScrollableScrollPhysics(),
                               onPageChanged: (int index) => setState(() {
                                 int numberIndex;
                                 numberIndex = index ~/ 60;
-                                minute = index - numberIndex * 60;
+                                changeMinute = index - numberIndex * 60;
                               }),
                               itemBuilder: (BuildContext context, int index) {
                                 int numberIndex;
                                 numberIndex = index ~/ 60;
                                 return Transform.scale(
-                                  scale: index - numberIndex * 60 == minute
-                                      ? 1.4
-                                      : 0.7,
+                                  scale:
+                                      index - numberIndex * 60 == changeMinute
+                                          ? 1.4
+                                          : 0.7,
                                   child: SizedBox(
                                       width: 120.w,
                                       height: 200.h,
@@ -211,7 +234,7 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                                               .padLeft(2, '0'),
                                           style: TextStyle(
                                             color: index - numberIndex * 60 ==
-                                                    minute
+                                                    changeMinute
                                                 ? Theme.of(context)
                                                     .colorScheme
                                                     .secondary
@@ -236,58 +259,148 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
             ),
           ),
         ),
-        bottomNavigationBar: BottomAppBar(
-          height: 80.h,
-          color: Theme.of(context).colorScheme.primaryContainer,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 1,
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Text(
-                    lang.cancel,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
+        bottomNavigationBar: editState
+            ? BottomAppBar(
+                height: 80.h,
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            editState = false;
+                          });
+                        },
+                        icon: Text(
+                          lang.cancel,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    Container(
+                      width: 1.w,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: IconButton(
+                        onPressed: () async {
+                          // edit event save logic
+                          int selectedYear = selectedDate.year;
+                          int selectedMonth = selectedDate.month;
+                          int selectedDay = selectedDate.day;
+                          DateTime eventDate = DateTime(
+                            selectedYear,
+                            selectedMonth,
+                            selectedDay,
+                            hour,
+                            minute,
+                          );
+                          DateTime changeEventDate = DateTime(
+                            selectedYear,
+                            selectedMonth,
+                            selectedDay,
+                            changeHour!,
+                            changeMinute!,
+                          );
+                          await editEvent(
+                            initialDate: eventDate,
+                            initialDetail: detail,
+                            changeDate: changeEventDate,
+                            changeDetail: changeDetail!,
+                          );
+                          Future.microtask(() => Navigator.pop(context));
+                        },
+                        icon: Text(
+                          lang.save,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : BottomAppBar(
+                height: 80.h,
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: IconButton(
+                        onPressed: () async {
+                          //delete event logic
+                          int selectedYear = selectedDate.year;
+                          int selectedMonth = selectedDate.month;
+                          int selectedDay = selectedDate.day;
+                          DateTime eventDate = DateTime(
+                            selectedYear,
+                            selectedMonth,
+                            selectedDay,
+                            hour,
+                            minute,
+                          );
+                          await deleteEvent(date: eventDate, detail: detail);
+                          Future.microtask(() => Navigator.pop(context));
+                        },
+                        icon: Icon(
+                          Icons.delete,
+                          color: Theme.of(context).colorScheme.secondary,
+                          size: 32.sp,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 1.w,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: IconButton(
+                        onPressed: () async {
+                          setState(() {
+                            editState = true;
+                          });
+                        },
+                        icon: Icon(
+                          Icons.border_color_rounded,
+                          color: Theme.of(context).colorScheme.secondary,
+                          size: 32.sp,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 1.w,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: IconButton(
+                        onPressed: () async {
+                          // share event logic
+                        },
+                        icon: Icon(
+                          Icons.share,
+                          color: Theme.of(context).colorScheme.secondary,
+                          size: 32.sp,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Container(
-                width: 1.w,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              Expanded(
-                flex: 1,
-                child: IconButton(
-                  onPressed: () async {
-                    // save event logic
-                    int selectedYear = selectedDate!.year;
-                    int selectedMonth = selectedDate!.month;
-                    int selectedDay = selectedDate!.day;
-                    DateTime eventDate = DateTime(
-                        selectedYear, selectedMonth, selectedDay, hour, minute);
-                    await saveEvent(date: eventDate, detail: detail);
-                    Future.microtask(() => Navigator.pop(context));
-                  },
-                  icon: Text(
-                    lang.save,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

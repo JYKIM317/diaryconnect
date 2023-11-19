@@ -379,217 +379,219 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
         children: [
           Scaffold(
             resizeToAvoidBottomInset: true,
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              leading: Padding(
-                padding: EdgeInsets.only(left: 8.w),
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    size: 28.sp,
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
-                ),
-              ),
-              actions: [
-                Padding(
-                  padding: EdgeInsets.only(right: 10.w),
+            body: Scaffold(
+              appBar: AppBar(
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                leading: Padding(
+                  padding: EdgeInsets.only(left: 8.w),
                   child: IconButton(
-                    onPressed: () async {
-                      //삭제 경고문구
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6.sp)),
-                                content: Text(
-                                  "${date.year}.${date.month}.${date.day} ${date.hour}:${date.minute.toString().padLeft(2, '0')}\n${lang.cautionDelete}",
-                                  style: TextStyle(fontSize: 18.sp),
-                                ),
-                                actions: [
-                                  TextButton(
-                                      child: Text(lang.cancel,
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14.sp,
-                                          )),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      }),
-                                  TextButton(
-                                      child: Text(lang.delete,
-                                          style: TextStyle(
-                                            color: Colors.red,
-                                            fontSize: 14.sp,
-                                          )),
-                                      onPressed: () async {
-                                        Navigator.pop(context);
-                                        await deleteEntry(date);
-                                        await Future.microtask(
-                                            () => Navigator.pop(context));
-                                      }),
-                                ]);
-                          });
-                      // delete Entry.. EntryWrite_model logic
+                    onPressed: () {
+                      Navigator.pop(context);
                     },
                     icon: Icon(
-                      Icons.delete,
+                      Icons.arrow_back_ios_new_rounded,
                       size: 28.sp,
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
-                )
-              ],
-              title: Text(
-                '${date.year}.${date.month}.${date.day} $dayOfWeek. ${date.hour}:${date.minute}',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondary,
-                  fontSize: isDateShow ? 0 : 18.sp,
                 ),
+                actions: [
+                  Padding(
+                    padding: EdgeInsets.only(right: 10.w),
+                    child: IconButton(
+                      onPressed: () async {
+                        //삭제 경고문구
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(6.sp)),
+                                  content: Text(
+                                    "${date.year}.${date.month}.${date.day} ${date.hour}:${date.minute.toString().padLeft(2, '0')}\n${lang.cautionDelete}",
+                                    style: TextStyle(fontSize: 18.sp),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                        child: Text(lang.cancel,
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14.sp,
+                                            )),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        }),
+                                    TextButton(
+                                        child: Text(lang.delete,
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 14.sp,
+                                            )),
+                                        onPressed: () async {
+                                          Navigator.pop(context);
+                                          await deleteEntry(date);
+                                          await Future.microtask(
+                                              () => Navigator.pop(context));
+                                        }),
+                                  ]);
+                            });
+                        // delete Entry.. EntryWrite_model logic
+                      },
+                      icon: Icon(
+                        Icons.delete,
+                        size: 28.sp,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                    ),
+                  )
+                ],
+                title: Text(
+                  '${date.year}.${date.month}.${date.day} $dayOfWeek. ${date.hour}:${date.minute}',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
+                    fontSize: isDateShow ? 0 : 18.sp,
+                  ),
+                ),
+                centerTitle: true,
               ),
-              centerTitle: true,
-            ),
-            body: SingleChildScrollView(
-              controller: scrollController,
-              physics: const ClampingScrollPhysics(),
-              child: Column(
-                children: [
-                  //scroll offset 0.0 date Container
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 100),
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    width: double.infinity,
-                    height: isDateShow ? 240.h : 0,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+              body: SingleChildScrollView(
+                controller: scrollController,
+                physics: const ClampingScrollPhysics(),
+                child: Column(
+                  children: [
+                    //scroll offset 0.0 date Container
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 100),
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      width: double.infinity,
+                      height: isDateShow ? 240.h : 0,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              '${date.year}.${date.month}',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.secondary,
+                                fontSize: 18.sp,
+                              ),
+                            ),
+                            Text(
+                              '${date.day}',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.secondary,
+                                fontSize: 78.sp,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              '$dayOfWeek. ${date.hour}:${date.minute}',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.secondary,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    //weather, mood overlay button
+                    Container(
+                      alignment: Alignment.centerRight,
+                      width: double.infinity,
+                      padding: EdgeInsets.fromLTRB(0, 24.h, 10.w, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text(
-                            '${date.year}.${date.month}',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.secondary,
-                              fontSize: 18.sp,
+                          CompositedTransformTarget(
+                            link: weatherlayerLink,
+                            child: IconButton(
+                              onPressed: () {
+                                _removeOverlay();
+                                weatherDropdown();
+                              },
+                              icon: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    weather,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                    size: 28.sp,
+                                  ),
+                                  Icon(
+                                    Icons.expand_more,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                    size: 16.sp,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          Text(
-                            '${date.day}',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.secondary,
-                              fontSize: 78.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            '$dayOfWeek. ${date.hour}:${date.minute}',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.secondary,
-                              fontSize: 14.sp,
+                          CompositedTransformTarget(
+                            link: moodlayerLink,
+                            child: IconButton(
+                              onPressed: () {
+                                _removeOverlay();
+                                moodDropdown();
+                              },
+                              icon: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    mood,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                    size: 18.sp,
+                                  ),
+                                  Icon(
+                                    Icons.expand_more,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                    size: 16.sp,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                  //weather, mood overlay button
-                  Container(
-                    alignment: Alignment.centerRight,
-                    width: double.infinity,
-                    padding: EdgeInsets.fromLTRB(0, 24.h, 10.w, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        CompositedTransformTarget(
-                          link: weatherlayerLink,
-                          child: IconButton(
-                            onPressed: () {
-                              _removeOverlay();
-                              weatherDropdown();
-                            },
-                            icon: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  weather,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  size: 28.sp,
-                                ),
-                                Icon(
-                                  Icons.expand_more,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  size: 16.sp,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        CompositedTransformTarget(
-                          link: moodlayerLink,
-                          child: IconButton(
-                            onPressed: () {
-                              _removeOverlay();
-                              moodDropdown();
-                            },
-                            icon: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  mood,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  size: 18.sp,
-                                ),
-                                Icon(
-                                  Icons.expand_more,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  size: 16.sp,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  //detail text
-                  Container(
-                    padding: EdgeInsets.fromLTRB(28.w, 24.h, 28.w, 24.h),
-                    child: TextField(
-                      controller: editingController,
-                      //이미지가 있으면 textfield minline 5 else 20
-                      minLines: image == 'null' ? 20 : 5,
-                      maxLines: null,
-                      decoration: const InputDecoration(
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                      ),
-                      onChanged: (value) async {
-                        detail = value;
-                        //데이터 저장
-                        await entrySave(
-                            weather: weather,
-                            mood: mood,
-                            date: date,
-                            detail: detail,
-                            image: image);
-                      },
-                    ),
-                  ),
-                  if (image != 'null')
+                    //detail text
                     Container(
-                      padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 10.h),
-                      child: Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          Image.memory(base64Decode(image)),
-                          IconButton(
+                      padding: EdgeInsets.fromLTRB(28.w, 24.h, 28.w, 24.h),
+                      child: TextField(
+                        controller: editingController,
+                        //이미지가 있으면 textfield minline 5 else 20
+                        minLines: image == 'null' ? 20 : 5,
+                        maxLines: null,
+                        decoration: const InputDecoration(
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        ),
+                        onChanged: (value) async {
+                          detail = value;
+                          //데이터 저장
+                          await entrySave(
+                              weather: weather,
+                              mood: mood,
+                              date: date,
+                              detail: detail,
+                              image: image);
+                        },
+                      ),
+                    ),
+                    if (image != 'null')
+                      Container(
+                        padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 10.h),
+                        child: Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            Image.memory(base64Decode(image)),
+                            IconButton(
                               onPressed: () async {
                                 showDialog(
                                     context: context,
@@ -604,32 +606,34 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                                           ),
                                           actions: [
                                             TextButton(
-                                                child: Text(lang.cancel,
-                                                    style: TextStyle(
-                                                      color: Colors.grey,
-                                                      fontSize: 14.sp,
-                                                    )),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                }),
+                                              child: Text(lang.cancel,
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 14.sp,
+                                                  )),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
                                             TextButton(
-                                                child: Text(lang.delete,
-                                                    style: TextStyle(
-                                                      color: Colors.red,
-                                                      fontSize: 14.sp,
-                                                    )),
-                                                onPressed: () async {
-                                                  image = 'null';
-                                                  await entrySave(
-                                                      weather: weather,
-                                                      mood: mood,
-                                                      date: date,
-                                                      detail: detail,
-                                                      image: image);
-                                                  setState(() {});
-                                                  await Future.microtask(() =>
-                                                      Navigator.pop(context));
-                                                }),
+                                              child: Text(lang.delete,
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                    fontSize: 14.sp,
+                                                  )),
+                                              onPressed: () async {
+                                                image = 'null';
+                                                await entrySave(
+                                                    weather: weather,
+                                                    mood: mood,
+                                                    date: date,
+                                                    detail: detail,
+                                                    image: image);
+                                                setState(() {});
+                                                await Future.microtask(() =>
+                                                    Navigator.pop(context));
+                                              },
+                                            ),
                                           ]);
                                     });
                               },
@@ -637,61 +641,71 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                                 Icons.highlight_off,
                                 size: 28.sp,
                                 color: Colors.black45,
-                              ))
-                        ],
-                      ),
-                    )
-                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                  ],
+                ),
               ),
-            ),
-            bottomNavigationBar: BottomAppBar(
-              height: 90.h,
-              padding: EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: () async {
-                      final String pickedImage = await getImage();
-                      if (pickedImage != 'null') {
-                        image = pickedImage;
-                        await entrySave(
-                            weather: weather,
-                            mood: mood,
-                            date: date,
-                            detail: detail,
-                            image: image);
-                        setState(() {});
-                      }
-                    },
-                    icon: Icon(
-                      Icons.image,
-                      color: Theme.of(context).colorScheme.secondary,
-                      size: 32.sp,
+              bottomNavigationBar: BottomAppBar(
+                height: 80.h,
+                padding: EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        FocusScope.of(context).unfocus();
+                        _removeOverlay();
+                        imoController.close();
+                        final String pickedImage = await getImage();
+                        if (pickedImage != 'null') {
+                          image = pickedImage;
+                          await entrySave(
+                              weather: weather,
+                              mood: mood,
+                              date: date,
+                              detail: detail,
+                              image: image);
+                          setState(() {});
+                        }
+                      },
+                      icon: Icon(
+                        Icons.image,
+                        color: Theme.of(context).colorScheme.secondary,
+                        size: 32.sp,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _removeOverlay();
-                      imoController.open();
-                    },
-                    icon: Icon(
-                      Icons.cruelty_free,
-                      color: Theme.of(context).colorScheme.secondary,
-                      size: 32.sp,
+                    IconButton(
+                      onPressed: () {
+                        FocusScope.of(context).unfocus();
+                        _removeOverlay();
+                        imoController.open();
+                      },
+                      icon: Icon(
+                        Icons.cruelty_free,
+                        color: Theme.of(context).colorScheme.secondary,
+                        size: 32.sp,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.share,
-                      color: Theme.of(context).colorScheme.secondary,
-                      size: 32.sp,
+                    IconButton(
+                      onPressed: () {
+                        FocusScope.of(context).unfocus();
+                        _removeOverlay();
+                        imoController.close();
+                      },
+                      icon: Icon(
+                        Icons.share,
+                        color: Theme.of(context).colorScheme.secondary,
+                        size: 32.sp,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

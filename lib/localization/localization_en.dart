@@ -1,10 +1,12 @@
 class USLang {
-  String entries = 'Entries';
+  String entries = 'Diary';
   String calendar = 'Calendar';
-  String shared = 'Shared';
+  String shared = 'Connect';
   String delete = 'Delete';
   String cancel = 'Cancel';
+  String save = 'Save';
   String cautionDelete = 'Would you like to delete it?';
   String addEvent = 'Add event';
   String noEvent = 'No event';
+  String title = 'Title';
 }

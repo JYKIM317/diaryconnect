@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-//List<String> 'eventList' : ['2023.11.7', '2023.11.21',] //all events user setup
+//Map<String, dynamic>'eventList' : {'2023.11.7' : [], '2023.11.21' : []} //all events user setup
 //List<Map<String, dynamic>> year.month.day(ex: 2023.11.7) : [event, event..]// several events
 /*
   Map<String, dynamic> event = {
-    'date' : DateTime()
+    'date' : DateTime().toString
     'detail' : String
   }
 */
@@ -21,14 +21,19 @@ Future<List<Map<String, dynamic>>> getSelectedDayEvent(
     for (String event in dayEvents) {
       //String to Map (jsonDecode)
       Map<String, dynamic> eventIndex = jsonDecode(event);
+      DateTime stringToDate = DateTime.parse(eventIndex['date']);
+      eventIndex['date'] = stringToDate;
       events.add(eventIndex);
+    }
+    if (events.length > 1) {
+      events.sort((a, b) => a['date'].compareTo(b['date']));
     }
   }
   return events;
 }
 
-Future<Map<String, List<dynamic>>> getEventCount() async {
-  Map<String, List<dynamic>> eventList = {};
+Future<Map<String, dynamic>> getEventCount() async {
+  Map<String, dynamic> eventList = {};
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final String? events = prefs.getString('eventList');
   if (events != null) {

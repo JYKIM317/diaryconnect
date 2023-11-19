@@ -7,6 +7,7 @@ import 'package:diaryconnect/main.dart';
 import 'package:diaryconnect/Theme/ThemeLangauge.dart';
 import 'Calendar_model.dart';
 import 'AddEvent_view.dart';
+import 'EditEvent_view.dart';
 
 class CalendarPage extends ConsumerStatefulWidget {
   const CalendarPage({super.key});
@@ -52,7 +53,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
               },
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 //load EventList
-                Map<String, List<dynamic>> eventDataLoad = snapshot.data;
+                Map<String, dynamic>? eventDataLoad = snapshot.data;
                 //실제 Calendar 부분
                 return TableCalendar(
                   focusedDay: _focusedDay,
@@ -99,7 +100,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                     markersMaxCount: 5,
                   ),
                   eventLoader: (day) =>
-                      eventDataLoad['${day.year}.${day.month}.${day.day}'] ??
+                      eventDataLoad?['${day.year}.${day.month}.${day.day}'] ??
                       [],
                 );
               }),
@@ -115,8 +116,8 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.only(left: 10.w),
             child: IconButton(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => AddEventPage(
@@ -124,6 +125,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                     ),
                   ),
                 );
+                setState(() {});
               },
               icon: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -189,7 +191,18 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                     DateTime date = event['date'];
                     String detail = event['detail'];
                     return IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditEventPage(
+                              date: date,
+                              detail: detail,
+                            ),
+                          ),
+                        );
+                        Future.microtask(() => setState(() {}));
+                      },
                       icon: Container(
                         width: double.infinity,
                         padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 10.h),
