@@ -8,6 +8,7 @@ import 'package:diaryconnect/Theme/ThemeLangauge.dart';
 import 'Calendar_model.dart';
 import 'AddEvent_view.dart';
 import 'EditEvent_view.dart';
+import 'package:diaryconnect/Theme/ChangeTheme_view.dart';
 
 class CalendarPage extends ConsumerStatefulWidget {
   const CalendarPage({super.key});
@@ -36,7 +37,16 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             alignment: Alignment.centerLeft,
             width: double.infinity,
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                  barrierDismissible: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    //Theme/ChangeTheme_view.dart
+                    return ChangeThemePage();
+                  },
+                );
+              },
               icon: Icon(
                 Icons.menu,
                 color: Theme.of(context).colorScheme.secondary,

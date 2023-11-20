@@ -37,6 +37,22 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       body: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          leading: Padding(
+            padding: EdgeInsets.only(left: 8.w),
+            child: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 28.sp,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+            ),
+          ),
+        ),
         body: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
@@ -58,7 +74,7 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                       alignment: Alignment.center,
                       padding: EdgeInsets.fromLTRB(20.w, 30.h, 20.w, 20.h),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.background,
                         borderRadius: BorderRadius.circular(12.sp),
                         boxShadow: [
                           BoxShadow(
@@ -105,7 +121,7 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                       width: double.infinity - 10.w,
                       height: 240.h,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.background,
                         borderRadius: BorderRadius.circular(12.sp),
                         boxShadow: [
                           BoxShadow(

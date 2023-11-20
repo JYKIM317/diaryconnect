@@ -9,4 +9,6 @@ class USLang {
   String addEvent = 'Add event';
   String noEvent = 'No event';
   String title = 'Title';
+  String appTheme = 'App Theme';
+  String langauge = 'Langauge';
 }

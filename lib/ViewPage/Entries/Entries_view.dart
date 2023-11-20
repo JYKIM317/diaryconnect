@@ -147,7 +147,7 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
                       padding: EdgeInsets.fromLTRB(10.w, 19.h, 10.w, 19.h),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12.sp),
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.background,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black26,

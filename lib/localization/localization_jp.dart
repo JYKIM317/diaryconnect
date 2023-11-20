@@ -9,4 +9,6 @@ class JPLang {
   String addEvent = 'スケジュール追加';
   String noEvent = 'スケジュールが空です';
   String title = 'タイトル';
+  String appTheme = 'アプリのテーマ';
+  String langauge = '言語';
 }
