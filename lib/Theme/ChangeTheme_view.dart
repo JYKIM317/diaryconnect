@@ -3,11 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:diaryconnect/main.dart';
-import 'ThemeColor.dart';
 import 'ThemeLangauge.dart';
-import 'package:diaryconnect/localization/localization_ko.dart';
-import 'package:diaryconnect/localization/localization_en.dart';
-import 'package:diaryconnect/localization/localization_jp.dart';
 
 class ChangeThemePage extends ConsumerStatefulWidget {
   const ChangeThemePage({super.key});
