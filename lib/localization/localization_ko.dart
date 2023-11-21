@@ -10,5 +10,5 @@ class KRLang {
   String noEvent = '일정이 비어있음';
   String title = '제목';
   String appTheme = '앱 테마';
-  String langauge = '언어';
+  String language = '언어';
 }

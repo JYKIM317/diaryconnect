@@ -10,5 +10,5 @@ class JPLang {
   String noEvent = 'スケジュールが空です';
   String title = 'タイトル';
   String appTheme = 'アプリのテーマ';
-  String langauge = '言語';
+  String language = '言語';
 }

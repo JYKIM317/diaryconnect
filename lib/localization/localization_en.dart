@@ -10,5 +10,5 @@ class USLang {
   String noEvent = 'No event';
   String title = 'Title';
   String appTheme = 'App Theme';
-  String langauge = 'Langauge';
+  String language = 'Language';
 }

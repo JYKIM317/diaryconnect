@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 
-import 'Entries_model.dart';
+import 'Diarys_model.dart';
 import 'package:diaryconnect/CustomIcon.dart';
 
 //Image image = Image.memory(base64Decode(thisEntry['image']));

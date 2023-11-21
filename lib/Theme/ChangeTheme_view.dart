@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:diaryconnect/main.dart';
-import 'ThemeLangauge.dart';
+import 'ThemeLanguage.dart';
 
 class ChangeThemePage extends ConsumerStatefulWidget {
   const ChangeThemePage({super.key});
@@ -112,7 +112,7 @@ class _ChangeThemePageState extends ConsumerState<ChangeThemePage> {
             ),
             //앱 테마 언어 변경
             Text(
-              lang.langauge,
+              lang.language,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.secondary,
                 fontSize: 21.sp,

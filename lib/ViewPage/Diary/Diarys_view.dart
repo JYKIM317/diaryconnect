@@ -4,17 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
-import 'Entries_model.dart';
-import 'package:diaryconnect/ViewPage/Entries/EntryWrite_view.dart';
+import 'Diarys_model.dart';
+import 'package:diaryconnect/ViewPage/Diary/DiaryWrite_view.dart';
 
-class EntriesPage extends ConsumerStatefulWidget {
-  const EntriesPage({super.key});
+class DiarysPage extends ConsumerStatefulWidget {
+  const DiarysPage({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _EntriesPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _DiarysPageState();
 }
 
-class _EntriesPageState extends ConsumerState<EntriesPage> {
+class _DiarysPageState extends ConsumerState<DiarysPage> {
   ScrollController scrollController = ScrollController();
   late double lastScrollOffset;
   onScroll() {}
@@ -121,14 +121,14 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
                   'dayOfWeek': dayOfWeek,
                   'image': image,
                 };
-
                 return InkWell(
                   onTap: () async {
                     lastScrollOffset = scrollController.offset - 1;
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EntryWrite(entryData: entryData),
+                        builder: (context) =>
+                            DiaryWritePage(entryData: entryData),
                       ),
                     );
                     setState(() {});
@@ -219,6 +219,7 @@ class _EntriesPageState extends ConsumerState<EntriesPage> {
                                       style: TextStyle(
                                         color: Colors.black54,
                                         fontSize: 16.sp,
+                                        fontFamily: 'null',
                                       ),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,

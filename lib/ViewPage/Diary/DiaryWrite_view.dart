@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bottom_drawer/bottom_drawer.dart';
 
-import 'EntryWrite_model.dart';
+import 'DiaryWrite_model.dart';
 import 'package:diaryconnect/main.dart';
 import 'package:diaryconnect/CustomIcon.dart';
 import 'package:diaryconnect/imoticon.dart';
@@ -34,15 +34,15 @@ import 'package:diaryconnect/imoticon.dart';
 
 /// create a bottom drawer controller to control the drawer.
 
-class EntryWrite extends ConsumerStatefulWidget {
+class DiaryWritePage extends ConsumerStatefulWidget {
   final Map<String, dynamic> entryData;
-  const EntryWrite({super.key, required this.entryData});
+  const DiaryWritePage({super.key, required this.entryData});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _EntryWriteState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _DiaryWritePageState();
 }
 
-class _EntryWriteState extends ConsumerState<EntryWrite> {
+class _DiaryWritePageState extends ConsumerState<DiaryWritePage> {
   late IconData weather, mood;
   late DateTime date;
   late String detail, dayOfWeek, image;
@@ -107,15 +107,16 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                       child: Text(
                         '${emoList[index]['1']}',
                         style: TextStyle(
-                            color:
-                                '${emoIndex['1']}' == '${emoList[index]['1']}'
-                                    ? Colors.black
-                                    : Theme.of(context).colorScheme.secondary,
-                            fontSize: 14.sp,
-                            fontWeight:
-                                '${emoIndex['1']}' == '${emoList[index]['1']}'
-                                    ? FontWeight.w700
-                                    : FontWeight.w500),
+                          color: '${emoIndex['1']}' == '${emoList[index]['1']}'
+                              ? Colors.black
+                              : Theme.of(context).colorScheme.secondary,
+                          fontSize: 14.sp,
+                          fontWeight:
+                              '${emoIndex['1']}' == '${emoList[index]['1']}'
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                          fontFamily: 'null',
+                        ),
                       ),
                     ),
                   ),
@@ -161,6 +162,8 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
                       fontSize: 20.sp,
+                      fontWeight: FontWeight.w300,
+                      fontFamily: 'null',
                     ),
                   ),
                 );
@@ -402,40 +405,43 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                       onPressed: () async {
                         //삭제 경고문구
                         showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(6.sp)),
-                                  content: Text(
-                                    "${date.year}.${date.month}.${date.day} ${date.hour}:${date.minute.toString().padLeft(2, '0')}\n${lang.cautionDelete}",
-                                    style: TextStyle(fontSize: 18.sp),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                        child: Text(lang.cancel,
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 14.sp,
-                                            )),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        }),
-                                    TextButton(
-                                        child: Text(lang.delete,
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 14.sp,
-                                            )),
-                                        onPressed: () async {
-                                          Navigator.pop(context);
-                                          await deleteEntry(date);
-                                          await Future.microtask(
-                                              () => Navigator.pop(context));
-                                        }),
-                                  ]);
-                            });
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6.sp)),
+                              content: Text(
+                                "${date.year}.${date.month}.${date.day} ${date.hour}:${date.minute.toString().padLeft(2, '0')}\n${lang.cautionDelete}",
+                                style: TextStyle(fontSize: 18.sp),
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: Text(lang.cancel,
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14.sp,
+                                      )),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text(lang.delete,
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 14.sp,
+                                      )),
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    await deleteEntry(date);
+                                    await Future.microtask(
+                                        () => Navigator.pop(context));
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
                         // delete Entry.. EntryWrite_model logic
                       },
                       icon: Icon(
@@ -568,6 +574,9 @@ class _EntryWriteState extends ConsumerState<EntryWrite> {
                         //이미지가 있으면 textfield minline 5 else 20
                         minLines: image == 'null' ? 20 : 5,
                         maxLines: null,
+                        style: const TextStyle(
+                          fontFamily: 'null',
+                        ),
                         decoration: const InputDecoration(
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'package:diaryconnect/main.dart';
-import 'package:diaryconnect/Theme/ThemeLangauge.dart';
+import 'package:diaryconnect/Theme/ThemeLanguage.dart';
 import 'Calendar_model.dart';
 import 'AddEvent_view.dart';
 import 'EditEvent_view.dart';
@@ -56,64 +56,62 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
           ),
           //Calendar
           FutureBuilder(
-              future: getEventCount(),
-              initialData: const {
-                //event initial data no reason
-                'initialData': ['initialData'],
-              },
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                //load EventList
-                Map<String, dynamic>? eventDataLoad = snapshot.data;
-                //실제 Calendar 부분
-                return TableCalendar(
-                  focusedDay: _focusedDay,
-                  firstDay: DateTime(2000, 1, 1),
-                  lastDay: DateTime(2099, 12, 31),
-                  calendarFormat: _calendarFormat,
-                  locale: selectedLocale,
-                  selectedDayPredicate: (day) {
-                    return isSameDay(_selectedDay, day);
-                  },
-                  onDaySelected: ((selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay = focusedDay;
-                    });
-                  }),
-                  onPageChanged: (focusedDay) {
+            future: getEventCount(),
+            initialData: const {
+              //event initial data no reason
+              'initialData': ['initialData'],
+            },
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              //load EventList
+              Map<String, dynamic>? eventDataLoad = snapshot.data;
+              //실제 Calendar 부분
+              return TableCalendar(
+                focusedDay: _focusedDay,
+                firstDay: DateTime(2000, 1, 1),
+                lastDay: DateTime(2099, 12, 31),
+                calendarFormat: _calendarFormat,
+                locale: selectedLocale,
+                selectedDayPredicate: (day) {
+                  return isSameDay(_selectedDay, day);
+                },
+                onDaySelected: ((selectedDay, focusedDay) {
+                  setState(() {
+                    _selectedDay = selectedDay;
                     _focusedDay = focusedDay;
-                  },
-                  daysOfWeekHeight: 24.h,
-                  availableCalendarFormats: const {
-                    CalendarFormat.month: "Month"
-                  },
-                  headerStyle: HeaderStyle(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                    ),
-                    headerMargin: EdgeInsets.only(bottom: 20.h),
-                    titleTextStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
-                      fontSize: 18.sp,
-                    ),
+                  });
+                }),
+                onPageChanged: (focusedDay) {
+                  _focusedDay = focusedDay;
+                },
+                daysOfWeekHeight: 24.h,
+                availableCalendarFormats: const {CalendarFormat.month: "Month"},
+                headerStyle: HeaderStyle(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
                   ),
-                  calendarStyle: CalendarStyle(
-                    selectedDecoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    todayDecoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                    ),
-                    markerDecoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.tertiaryContainer),
-                    markersAlignment: Alignment.bottomCenter,
-                    markersMaxCount: 5,
+                  headerMargin: EdgeInsets.only(bottom: 20.h),
+                  titleTextStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
+                    fontSize: 18.sp,
                   ),
-                  eventLoader: (day) =>
-                      eventDataLoad?['${day.year}.${day.month}.${day.day}'] ??
-                      [],
-                );
-              }),
+                ),
+                calendarStyle: CalendarStyle(
+                  selectedDecoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  todayDecoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  markerDecoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.tertiaryContainer),
+                  markersAlignment: Alignment.bottomCenter,
+                  markersMaxCount: 5,
+                ),
+                eventLoader: (day) =>
+                    eventDataLoad?['${day.year}.${day.month}.${day.day}'] ?? [],
+              );
+            },
+          ),
           //divide calender and event
           Container(
             width: double.infinity,
@@ -169,9 +167,6 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             child: FutureBuilder(
               future: getSelectedDayEvent(_selectedDay),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
-                /*if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Text('');
-                }*/
                 List<Map<String, dynamic>>? selectedDayEvent = snapshot.data;
                 //선택한 날짜에 이벤트가 없을 시
                 if (selectedDayEvent == null || selectedDayEvent.isEmpty) {

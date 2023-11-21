@@ -28,20 +28,20 @@ initializedLang(String locale) {
 }
 
 String getLangagueCode(var lang) {
-  String langauge;
+  String language;
   switch (lang) {
     case KRLang():
-      langauge = 'ko_KR';
+      language = 'ko_KR';
       break;
     case USLang():
-      langauge = 'en_US';
+      language = 'en_US';
       break;
     case JPLang():
-      langauge = 'ja_JP';
+      language = 'ja_JP';
       break;
     default:
-      langauge = Platform.localeName;
+      language = Platform.localeName;
       break;
   }
-  return langauge;
+  return language;
 }
