@@ -11,4 +11,13 @@ class KRLang {
   String title = '제목';
   String appTheme = '앱 테마';
   String language = '언어';
+  String addFriend = '친구 추가';
+  String myPage = '마이페이지';
+  String me = '나';
+  String copySucess = '복사 성공';
+  String friend = '친구';
+  String empty = '비어있음';
+  String findFriend = '친구 찾기';
+  String request = '요청';
+  String noUser = '사용자 없음';
 }

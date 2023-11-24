@@ -11,4 +11,13 @@ class USLang {
   String title = 'Title';
   String appTheme = 'App Theme';
   String language = 'Language';
+  String addFriend = 'Add Friend';
+  String myPage = 'My Page';
+  String me = 'Me';
+  String copySucess = 'Copy Sucess';
+  String friend = 'Friends';
+  String empty = 'Empty';
+  String findFriend = 'Find Friends';
+  String request = 'Request';
+  String noUser = 'No User';
 }

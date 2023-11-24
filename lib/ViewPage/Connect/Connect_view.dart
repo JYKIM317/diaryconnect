@@ -1,18 +1,18 @@
-import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'Connect_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+import 'Connect_model.dart';
 import 'package:diaryconnect/main.dart';
 import 'package:diaryconnect/CustomIcon.dart';
-import 'package:diaryconnect/ViewPage/Diary/Diarys_model.dart';
-import 'package:diaryconnect/ViewPage/Diary/DiaryWrite_view.dart';
-import 'package:diaryconnect/ViewPage/Calendar/Calendar_model.dart';
-import 'package:diaryconnect/ViewPage/Calendar/EditEvent_view.dart';
 import 'package:diaryconnect/Theme/ThemeLanguage.dart';
+import 'MyPage/MyPage_view.dart';
+
+import 'package:diaryconnect/ViewPage/Diary/DiaryWrite_view.dart';
+import 'package:diaryconnect/ViewPage/Calendar/EditEvent_view.dart';
 
 class ConnectPage extends ConsumerStatefulWidget {
   const ConnectPage({super.key});
@@ -22,12 +22,10 @@ class ConnectPage extends ConsumerStatefulWidget {
 }
 
 class _ConnectPageState extends ConsumerState<ConnectPage> {
-  ScrollController scrollController = ScrollController();
-  late double lastScrollOffset;
-
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
   final CalendarFormat _calendarFormat = CalendarFormat.month;
+  String? userUID = FirebaseAuth.instance.currentUser!.uid;
 
   bool pageState = true;
   @override
@@ -35,12 +33,47 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
     final lang = ref.watch(themeLang);
     String selectedLocale = getLangagueCode(lang);
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 10.w),
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyPage(),
+                  ),
+                );
+              },
+              icon: Row(
+                children: [
+                  Text(
+                    lang.myPage,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                      fontSize: 18.sp,
+                    ),
+                  ),
+                  SizedBox(width: 4.w),
+                  Icon(
+                    Icons.person,
+                    size: 32.sp,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                ],
+              ),
+              highlightColor: Theme.of(context).colorScheme.background,
+            ),
+          )
+        ],
+      ),
       body: Column(
         children: [
           Container(
-            height: 160.h,
             width: double.infinity,
-            padding: EdgeInsets.only(top: 47.h),
+            padding: EdgeInsets.only(top: 10.h),
             alignment: Alignment.bottomCenter,
             color: Theme.of(context).colorScheme.primaryContainer,
             child: Row(
@@ -105,202 +138,208 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
           pageState
               //Calendar!!!
               ? Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    child: Column(
-                      children: [
-                        FutureBuilder(
-                          future: getEventCount(),
-                          initialData: const {
-                            //event initial data no reason
-                            'initialData': ['initialData'],
-                          },
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            //load EventList
-                            Map<String, dynamic>? eventDataLoad = snapshot.data;
-                            //실제 Calendar 부분
-                            return TableCalendar(
-                              focusedDay: _focusedDay,
-                              firstDay: DateTime(2000, 1, 1),
-                              lastDay: DateTime(2099, 12, 31),
-                              calendarFormat: _calendarFormat,
-                              locale: selectedLocale,
-                              selectedDayPredicate: (day) {
-                                return isSameDay(_selectedDay, day);
-                              },
-                              onDaySelected: ((selectedDay, focusedDay) {
-                                setState(() {
-                                  _selectedDay = selectedDay;
-                                  _focusedDay = focusedDay;
-                                });
-                              }),
-                              onPageChanged: (focusedDay) {
-                                _focusedDay = focusedDay;
-                              },
-                              daysOfWeekHeight: 24.h,
-                              availableCalendarFormats: const {
-                                CalendarFormat.month: "Month"
-                              },
-                              headerStyle: HeaderStyle(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer,
-                                ),
-                                headerMargin: EdgeInsets.only(bottom: 20.h),
-                                titleTextStyle: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  fontSize: 18.sp,
-                                ),
-                              ),
-                              calendarStyle: CalendarStyle(
-                                selectedDecoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
-                                todayDecoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer,
-                                ),
-                                markerDecoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .tertiaryContainer),
-                                markersAlignment: Alignment.bottomCenter,
-                                markersMaxCount: 5,
-                              ),
-                              eventLoader: (day) =>
-                                  eventDataLoad?[
-                                      '${day.year}.${day.month}.${day.day}'] ??
-                                  [],
-                            );
-                          },
-                        ),
-                        //divide calender and event
-                        Container(
-                          width: double.infinity,
-                          height: 2.h,
-                          margin: EdgeInsets.only(top: 10.h),
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                        ),
-                        SizedBox(height: 30.h),
-                        //show event
-                        Container(
-                          padding: EdgeInsets.fromLTRB(10.w, 0, 10.w, 34.h),
-                          child: FutureBuilder(
-                            future: getSelectedDayEvent(_selectedDay),
+                  child: SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        children: [
+                          FutureBuilder(
+                            future: getEventCount(),
+                            initialData: const {
+                              //event initial data no reason
+                              'initialData': ['initialData'],
+                            },
                             builder:
                                 (BuildContext context, AsyncSnapshot snapshot) {
-                              List<Map<String, dynamic>>? selectedDayEvent =
+                              //load EventList
+                              Map<String, dynamic>? eventDataLoad =
                                   snapshot.data;
-                              //선택한 날짜에 이벤트가 없을 시
-                              if (selectedDayEvent == null ||
-                                  selectedDayEvent.isEmpty) {
-                                return Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.only(left: 10.w),
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    lang.noEvent,
-                                    style: TextStyle(
+                              //실제 Calendar 부분
+                              return TableCalendar(
+                                focusedDay: _focusedDay,
+                                firstDay: DateTime(2000, 1, 1),
+                                lastDay: DateTime(2099, 12, 31),
+                                calendarFormat: _calendarFormat,
+                                locale: selectedLocale,
+                                selectedDayPredicate: (day) {
+                                  return isSameDay(_selectedDay, day);
+                                },
+                                onDaySelected: ((selectedDay, focusedDay) {
+                                  setState(() {
+                                    _selectedDay = selectedDay;
+                                    _focusedDay = focusedDay;
+                                  });
+                                }),
+                                onPageChanged: (focusedDay) {
+                                  _focusedDay = focusedDay;
+                                },
+                                daysOfWeekHeight: 24.h,
+                                availableCalendarFormats: const {
+                                  CalendarFormat.month: "Month"
+                                },
+                                headerStyle: HeaderStyle(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                  ),
+                                  headerMargin: EdgeInsets.only(bottom: 20.h),
+                                  titleTextStyle: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                    fontSize: 18.sp,
+                                  ),
+                                ),
+                                calendarStyle: CalendarStyle(
+                                  selectedDecoration: BoxDecoration(
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
+                                  todayDecoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                  ),
+                                  markerDecoration: BoxDecoration(
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .secondary
-                                          .withOpacity(0.5),
-                                      fontSize: 24.sp,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                );
-                              }
-                              return ListView.separated(
-                                shrinkWrap: true,
-                                physics: const ClampingScrollPhysics(),
-                                itemCount: selectedDayEvent.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  Map<String, dynamic> event =
-                                      selectedDayEvent[index];
-                                  DateTime date = event['date'];
-                                  String detail = event['detail'];
-                                  return IconButton(
-                                    onPressed: () async {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EditEventPage(
-                                            date: date,
-                                            detail: detail,
-                                          ),
-                                        ),
-                                      );
-                                      Future.microtask(() => setState(() {}));
-                                    },
-                                    icon: Container(
-                                      width: double.infinity,
-                                      padding: EdgeInsets.fromLTRB(
-                                          10.w, 10.h, 10.w, 10.h),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            padding:
-                                                EdgeInsets.only(right: 14.w),
-                                            child: Icon(
-                                              Icons.edit_calendar,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .secondary,
-                                              size: 34.sp,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  detail,
-                                                  maxLines: 2,
-                                                  style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary,
-                                                    fontSize: 18.sp,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  '${date.hour}:${date.minute < 10 ? 0.toString() + date.minute.toString() : date.minute}',
-                                                  style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary,
-                                                    fontSize: 14.sp,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                                separatorBuilder: (context, index) {
-                                  return SizedBox(
-                                    height: 10.h,
-                                  );
-                                },
+                                          .tertiaryContainer),
+                                  markersAlignment: Alignment.bottomCenter,
+                                  markersMaxCount: 5,
+                                ),
+                                eventLoader: (day) =>
+                                    eventDataLoad?[
+                                        '${day.year}.${day.month}.${day.day}'] ??
+                                    [],
                               );
                             },
                           ),
-                        ),
-                      ],
+                          //divide calender and event
+                          Container(
+                            width: double.infinity,
+                            height: 2.h,
+                            margin: EdgeInsets.only(top: 10.h),
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                          ),
+                          SizedBox(height: 30.h),
+                          //show event
+                          Container(
+                            padding: EdgeInsets.fromLTRB(10.w, 0, 10.w, 34.h),
+                            child: FutureBuilder(
+                              future: getSelectedDayEvent(_selectedDay),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                List<Map<String, dynamic>>? selectedDayEvent =
+                                    snapshot.data;
+                                //선택한 날짜에 이벤트가 없을 시
+                                if (selectedDayEvent == null ||
+                                    selectedDayEvent.isEmpty) {
+                                  return Container(
+                                    width: double.infinity,
+                                    padding: EdgeInsets.only(left: 10.w),
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      lang.noEvent,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary
+                                            .withOpacity(0.5),
+                                        fontSize: 24.sp,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: const ClampingScrollPhysics(),
+                                  itemCount: selectedDayEvent.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    Map<String, dynamic> event =
+                                        selectedDayEvent[index];
+                                    DateTime date = event['date'];
+                                    String detail = event['detail'];
+                                    return IconButton(
+                                      onPressed: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => EditEventPage(
+                                              date: date,
+                                              detail: detail,
+                                            ),
+                                          ),
+                                        );
+                                        Future.microtask(() => setState(() {}));
+                                      },
+                                      icon: Container(
+                                        width: double.infinity,
+                                        padding: EdgeInsets.fromLTRB(
+                                            10.w, 10.h, 10.w, 10.h),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 14.w),
+                                              child: Icon(
+                                                Icons.edit_calendar,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                size: 34.sp,
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    detail,
+                                                    maxLines: 2,
+                                                    style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .secondary,
+                                                      fontSize: 18.sp,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${date.hour}:${date.minute < 10 ? 0.toString() + date.minute.toString() : date.minute}',
+                                                    style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .secondary,
+                                                      fontSize: 14.sp,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  separatorBuilder: (context, index) {
+                                    return SizedBox(
+                                      height: 10.h,
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 )
@@ -314,6 +353,7 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                       child: FutureBuilder(
                         //Get Entries Data from Entries_model
                         future: getEntries(),
+                        initialData: const [],
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.connectionState ==
@@ -390,6 +430,7 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                               final String dayOfWeek =
                                   DateFormat('E', 'en_US').format(date);
                               final String image = thisEntry['image'];
+                              final String uid = thisEntry['uid'];
                               //Image image = Image.memory(base64Decode(thisEntry['image']));
                               if (image != 'null') {
                                 imageExist = true;
@@ -404,20 +445,12 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                               };
                               return InkWell(
                                 onTap: () async {
-                                  lastScrollOffset =
-                                      scrollController.offset - 1;
-                                  await Navigator.push(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           DiaryWritePage(entryData: entryData),
                                     ),
-                                  );
-                                  setState(() {});
-                                  scrollController.animateTo(
-                                    lastScrollOffset,
-                                    duration: const Duration(milliseconds: 10),
-                                    curve: Curves.easeInOut,
                                   );
                                 },
                                 child: Padding(
@@ -493,14 +526,32 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                                                   MainAxisAlignment.center,
                                               children: [
                                                 //시간
-                                                Text(
-                                                  '${date.hour}:${date.minute.toString().padLeft(2, '0')}',
-                                                  style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary,
-                                                    fontSize: 12.sp,
-                                                  ),
+                                                Text.rich(
+                                                  TextSpan(
+                                                      text:
+                                                          '${date.hour}:${date.minute.toString().padLeft(2, '0')}  ',
+                                                      style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .secondary,
+                                                        fontSize: 12.sp,
+                                                      ),
+                                                      children: [
+                                                        if (userUID == uid)
+                                                          TextSpan(
+                                                            text: lang.me,
+                                                            style: TextStyle(
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .tertiaryContainer,
+                                                              fontSize: 12.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                            ),
+                                                          )
+                                                      ]),
                                                 ),
                                                 ConstrainedBox(
                                                   constraints: BoxConstraints(

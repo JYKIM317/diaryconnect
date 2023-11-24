@@ -409,7 +409,8 @@ class _DiaryWritePageState extends ConsumerState<DiaryWritePage> {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6.sp)),
+                                borderRadius: BorderRadius.circular(6.sp),
+                              ),
                               content: Text(
                                 "${date.year}.${date.month}.${date.day} ${date.hour}:${date.minute.toString().padLeft(2, '0')}\n${lang.cautionDelete}",
                                 style: TextStyle(fontSize: 18.sp),
@@ -607,8 +608,9 @@ class _DiaryWritePageState extends ConsumerState<DiaryWritePage> {
                                     builder: (BuildContext context) {
                                       return AlertDialog(
                                           shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(6.sp)),
+                                            borderRadius:
+                                                BorderRadius.circular(6.sp),
+                                          ),
                                           content: Text(
                                             lang.cautionDelete,
                                             style: TextStyle(fontSize: 18.sp),

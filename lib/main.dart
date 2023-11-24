@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 
 import 'Theme/ThemeColor.dart';
@@ -98,11 +99,9 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   //Firebase auth login
   await FirebaseAuth.instance.signInAnonymously();
-  User? user = FirebaseAuth.instance.currentUser;
-  String? userUID = user!.uid;
-  print('auth uid is $userUID');
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final bool? firstLogin = prefs.getBool('firstLogin');
+  String? userUID = FirebaseAuth.instance.currentUser!.uid;
 
   //Calendar locale init initialize
   await initializeDateFormatting();
@@ -112,7 +111,20 @@ void main() async {
     await prefs.setString('themeColor', 'indigo');
     await prefs.setInt('firstLoginYear', thisYear);
     await prefs.setBool('firstLogin', false);
+
+    //UID always 28 characters
+    final String hashcode = userUID.substring(0, 4) +
+        userUID.substring(13, 15) +
+        userUID.substring(27, 28);
+    await FirebaseFirestore.instance.collection('Users').doc(userUID).set({
+      'Name': 'anonymous',
+      'HashCode': '#$hashcode',
+      'uid': userUID,
+    });
   }
+  await FirebaseFirestore.instance.collection('Users').doc(userUID).update({
+    'LastLogin': DateTime.now(),
+  });
   language = prefs.getString('language') ?? defaultLocale;
   appTheme = prefs.getString('themeColor') ?? 'indigo';
 

@@ -11,4 +11,13 @@ class JPLang {
   String title = 'タイトル';
   String appTheme = 'アプリのテーマ';
   String language = '言語';
+  String addFriend = '友達を追加';
+  String myPage = 'マイページ';
+  String me = '私';
+  String copySucess = 'コピー成功';
+  String friend = 'ともだち';
+  String empty = '空';
+  String findFriend = '友達探し';
+  String request = 'リクエスト';
+  String noUser = 'ユーザーが\nいません';
 }
