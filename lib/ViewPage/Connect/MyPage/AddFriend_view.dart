@@ -274,7 +274,70 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                           IconButton(
                                             onPressed: () async {
                                               if (searchUserUID != null) {
-                                                print('친구 신청 로직 ');
+                                                bool requestResult =
+                                                    await requestFriend(
+                                                        searchUserUID);
+                                                Future.microtask(
+                                                  () {
+                                                    requestResult
+                                                        //친구 요청이 정상적으로 수행 된 경우
+                                                        ? ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                            SnackBar(
+                                                              content: Center(
+                                                                child: Text(
+                                                                  lang.requestSucess,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .colorScheme
+                                                                        .onSecondary,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              duration:
+                                                                  const Duration(
+                                                                      seconds:
+                                                                          2),
+                                                              backgroundColor:
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .colorScheme
+                                                                      .secondary,
+                                                            ),
+                                                          )
+                                                        //상대 목록에 이미 이용자가 있는 경우
+                                                        : ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                            SnackBar(
+                                                              content: Center(
+                                                                child: Text(
+                                                                  lang.alreadyRequest,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .colorScheme
+                                                                        .onSecondary,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              duration:
+                                                                  const Duration(
+                                                                      seconds:
+                                                                          2),
+                                                              backgroundColor:
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .colorScheme
+                                                                      .secondary,
+                                                            ),
+                                                          );
+                                                  },
+                                                );
                                               }
                                             },
                                             icon: Icon(
@@ -393,7 +456,10 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                         IconButton(
                                           onPressed: () async {
                                             if (requestUserUID != null) {
-                                              print('친구 신청 수락 로직');
+                                              //요청 수락
+                                              await acceptRequest(
+                                                  requestUserUID);
+                                              setState(() {});
                                             }
                                           },
                                           icon: Icon(
@@ -407,7 +473,10 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                         IconButton(
                                           onPressed: () async {
                                             if (requestUserUID != null) {
-                                              print('친구 신청 거절 로직');
+                                              //요청 거절
+                                              await deniedRequest(
+                                                  requestUserUID);
+                                              setState(() {});
                                             }
                                           },
                                           icon: Icon(

@@ -20,4 +20,6 @@ class KRLang {
   String findFriend = '친구 찾기';
   String request = '요청';
   String noUser = '사용자 없음';
+  String requestSucess = '친구 요청 완료';
+  String alreadyRequest = '이미 요청한 대상입니다';
 }

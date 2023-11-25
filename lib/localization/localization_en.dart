@@ -20,4 +20,6 @@ class USLang {
   String findFriend = 'Find Friends';
   String request = 'Request';
   String noUser = 'No User';
+  String requestSucess = 'Friend Request Sent';
+  String alreadyRequest = 'Already sent a request to this user';
 }

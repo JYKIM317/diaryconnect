@@ -20,4 +20,6 @@ class JPLang {
   String findFriend = '友達探し';
   String request = 'リクエスト';
   String noUser = 'ユーザーが\nいません';
+  String requestSucess = '友達リクエストが完了しました';
+  String alreadyRequest = '既にこのユーザーにリクエストを送信しました';
 }

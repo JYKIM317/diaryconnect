@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+//해쉬코드로 유저 검색
 Future<List<Map<String, dynamic>>> searchFriend(String searchText) async {
   List<Map<String, dynamic>> searchUserList = [];
 
@@ -32,6 +33,7 @@ Future<List<Map<String, dynamic>>> searchFriend(String searchText) async {
   return searchUserList;
 }
 
+//친구 요청 불러오기
 Future<List<Map<String, dynamic>>> getRequestList() async {
   List<Map<String, dynamic>> requestUserList = [];
 
@@ -59,4 +61,82 @@ Future<List<Map<String, dynamic>>> getRequestList() async {
   }
 
   return requestUserList;
+}
+
+//친구신청 로직
+Future<bool> requestFriend(String uid) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  String? userUID = user!.uid;
+  bool exist = false;
+  bool result = true;
+
+  var requestFromFirebase = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(uid)
+      .collection('Request')
+      .get();
+  List<DocumentSnapshot> requestList = requestFromFirebase.docs.toList();
+  for (DocumentSnapshot requestUsers in requestList) {
+    if (requestUsers.id == userUID) {
+      exist = true;
+      result = false;
+    }
+  }
+  if (!exist) {
+    result = true;
+    final dataFromFirebase =
+        await FirebaseFirestore.instance.collection('Users').doc(userUID).get();
+    Map<String, dynamic>? myInfo = dataFromFirebase.data();
+    myInfo?.remove('LastLogin');
+    if (myInfo != null && myInfo.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(uid)
+          .collection('Request')
+          .doc(userUID)
+          .set(myInfo);
+    }
+  }
+  return result;
+}
+
+//친구요청 수락
+Future<void> acceptRequest(String uid) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  String? userUID = user!.uid;
+  final requestUser = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userUID)
+      .collection('Request')
+      .doc(uid)
+      .get();
+  Map<String, dynamic>? requestUserInfo = requestUser.data();
+  if (requestUserInfo != null && requestUserInfo.isNotEmpty) {
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userUID)
+        .collection('Friend')
+        .doc(uid)
+        .set(requestUserInfo)
+        .then((value) async {
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userUID)
+          .collection('Request')
+          .doc(uid)
+          .delete();
+    });
+  }
+}
+
+//친구요청 거절
+Future<void> deniedRequest(String uid) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  String? userUID = user!.uid;
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userUID)
+      .collection('Request')
+      .doc(uid)
+      .delete();
 }

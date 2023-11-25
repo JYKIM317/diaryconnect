@@ -136,19 +136,24 @@ class _MyPageState extends ConsumerState<MyPage> {
                                       Clipboard.setData(
                                           ClipboardData(text: myHashCode));
                                       ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                        content: Center(
-                                          child: Text(lang.copySucess,
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Center(
+                                            child: Text(
+                                              lang.copySucess,
                                               style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondary)),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary,
+                                              ),
+                                            ),
+                                          ),
+                                          duration: const Duration(seconds: 2),
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
                                         ),
-                                        duration: const Duration(seconds: 2),
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                      ));
+                                      );
                                     },
                                     icon: Icon(
                                       Icons.content_copy,
