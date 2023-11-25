@@ -264,6 +264,9 @@ class _MyPageState extends ConsumerState<MyPage> {
                   future: getFriendList(),
                   initialData: const [],
                   builder: (BuildContext contex, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const SizedBox();
+                    }
                     List<dynamic> friendList = snapshot.data.toList();
                     if (friendList.isEmpty) {
                       return SizedBox(
@@ -343,7 +346,9 @@ class _MyPageState extends ConsumerState<MyPage> {
                               IconButton(
                                   onPressed: () async {
                                     if (friendUID != null) {
-                                      print('당사자 친구목록 및 내 친구목록에서 서로 지우는 로직');
+                                      //친구삭제
+                                      await deleteFriend(friendUID);
+                                      setState(() {});
                                     }
                                   },
                                   icon: Icon(

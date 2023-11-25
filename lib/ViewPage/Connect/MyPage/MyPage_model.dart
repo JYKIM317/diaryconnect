@@ -60,3 +60,19 @@ Future<void> modifyMyName(String name) async {
     'Name': name,
   });
 }
+
+Future<void> deleteFriend(String uid) async {
+  String? userUID = FirebaseAuth.instance.currentUser!.uid;
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(uid)
+      .collection('Friend')
+      .doc(userUID)
+      .delete();
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userUID)
+      .collection('Friend')
+      .doc(uid)
+      .delete();
+}
