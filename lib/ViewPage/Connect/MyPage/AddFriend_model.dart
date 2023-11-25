@@ -13,19 +13,33 @@ Future<List<Map<String, dynamic>>> searchFriend(String searchText) async {
 
   //Firestore Users에서 Hashcode로 비교해서 같은 유저 가져오기 (본인 제외)
   if ('#$hashcode' != searchText) {
+    //내 친구 리스트 불러와서 있으면 포함 안시키게
+    final myFriendList = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userUID)
+        .collection('Friend')
+        .get();
+    List<DocumentSnapshot> friendList = myFriendList.docs.toList();
+
     var searchFromFirebase = await FirebaseFirestore.instance
         .collection('Users')
         .where('HashCode', isEqualTo: searchText)
         .get();
     List<DocumentSnapshot> equalHashCodeList = searchFromFirebase.docs.toList();
+
+    //friendListm equalHashCodeList compare
+    Set<String> friendID = Set.from(friendList.map((doc) => doc.id));
+
     for (DocumentSnapshot equalUser in equalHashCodeList) {
-      final userData = await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(equalUser.id)
-          .get();
-      Map<String, dynamic>? userInfo = userData.data();
-      if (userInfo != null && userInfo.isNotEmpty) {
-        searchUserList.add(userInfo);
+      if (!friendID.contains(equalUser.id)) {
+        final userData = await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(equalUser.id)
+            .get();
+        Map<String, dynamic>? userInfo = userData.data();
+        if (userInfo != null && userInfo.isNotEmpty) {
+          searchUserList.add(userInfo);
+        }
       }
     }
   }
@@ -84,9 +98,9 @@ Future<bool> requestFriend(String uid) async {
   }
   if (!exist) {
     result = true;
-    final dataFromFirebase =
+    final myData =
         await FirebaseFirestore.instance.collection('Users').doc(userUID).get();
-    Map<String, dynamic>? myInfo = dataFromFirebase.data();
+    Map<String, dynamic>? myInfo = myData.data();
     myInfo?.remove('LastLogin');
     if (myInfo != null && myInfo.isNotEmpty) {
       await FirebaseFirestore.instance
@@ -112,20 +126,31 @@ Future<void> acceptRequest(String uid) async {
       .get();
   Map<String, dynamic>? requestUserInfo = requestUser.data();
   if (requestUserInfo != null && requestUserInfo.isNotEmpty) {
+    final myData =
+        await FirebaseFirestore.instance.collection('Users').doc(userUID).get();
+    Map<String, dynamic>? myInfo = myData.data();
+    myInfo?.remove('LastLogin');
+
     await FirebaseFirestore.instance
         .collection('Users')
         .doc(userUID)
         .collection('Friend')
         .doc(uid)
         .set(requestUserInfo)
-        .then((value) async {
+        .then((_) async {
       await FirebaseFirestore.instance
           .collection('Users')
-          .doc(userUID)
-          .collection('Request')
           .doc(uid)
-          .delete();
+          .collection('Friend')
+          .doc(userUID)
+          .set(myInfo!);
     });
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userUID)
+        .collection('Request')
+        .doc(uid)
+        .delete();
   }
 }
 
