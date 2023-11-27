@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<void> editEvent({
   required DateTime initialDate,
@@ -69,4 +71,92 @@ Future<void> deleteEvent(
   }
   String eventListData = jsonEncode(events);
   await prefs.setString('eventList', eventListData);
+}
+
+Future<void> shareEvent({
+  required DateTime date,
+  required String detail,
+  required String uid,
+}) async {
+  String? userUID = FirebaseAuth.instance.currentUser!.uid;
+  String eventName = '${date.year}.${date.month}.${date.day}';
+
+  String dateToString = date.toString();
+  Map<String, dynamic> event = {
+    'date': dateToString,
+    'detail': detail,
+    'uid': userUID,
+  };
+  //업데이트 할 event
+  String eventData = jsonEncode(event);
+
+  //상대에게 이벤트 추가
+  final eventAdress = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(uid)
+      .collection('Calendar')
+      .doc(eventName)
+      .get();
+  Map<String, dynamic>? events = eventAdress.data() ?? {};
+  List<dynamic> eventList = events['Events'] ?? [];
+  eventList.add(eventData);
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(uid)
+      .collection('Calendar')
+      .doc(eventName)
+      .set({'Events': eventList});
+
+  //상대 이벤트 카운트 추가
+  final eventCountAdress = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(uid)
+      .collection('Calendar')
+      .doc('EventList')
+      .get();
+  Map<String, dynamic>? eventCount = eventCountAdress.data() ?? {};
+  List<dynamic> eventCountList = eventCount[eventName] ?? [];
+  eventCountList.add('event');
+  eventCount[eventName] = eventCountList;
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(uid)
+      .collection('Calendar')
+      .doc('EventList')
+      .set(eventCount);
+
+  //나에게 이벤트 추가
+  final myEventAdress = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userUID)
+      .collection('Calendar')
+      .doc(eventName)
+      .get();
+  Map<String, dynamic>? myEvents = myEventAdress.data() ?? {};
+  List<dynamic> myEventList = myEvents['Events'] ?? [];
+  myEventList.add(eventData);
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userUID)
+      .collection('Calendar')
+      .doc(eventName)
+      .set({'Events': myEventList});
+
+  //내 이벤트 카운트 추가
+  final myEventCountAdress = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userUID)
+      .collection('Calendar')
+      .doc('EventList')
+      .get();
+  Map<String, dynamic>? myEventCount = myEventCountAdress.data() ?? {};
+  List<dynamic> myEventCountList = myEventCount[eventName] ?? [];
+  myEventCountList.add('event');
+  myEventCount[eventName] = myEventCountList;
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userUID)
+      .collection('Calendar')
+      .doc('EventList')
+      .set(myEventCount);
 }

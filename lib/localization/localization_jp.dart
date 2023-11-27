@@ -22,4 +22,5 @@ class JPLang {
   String noUser = 'ユーザーが\nいません';
   String requestSucess = '友達リクエストが完了しました';
   String alreadyRequest = '既にこのユーザーにリクエストを送信しました';
+  String shareComplete = 'シェア完了';
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:diaryconnect/main.dart';
 import 'EditEvent_model.dart';
+import 'package:diaryconnect/ViewPage/Connect/MyPage/MyPage_model.dart';
 
 class EditEventPage extends ConsumerStatefulWidget {
   final DateTime date;
@@ -406,7 +407,227 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                       flex: 1,
                       child: IconButton(
                         onPressed: () async {
+                          int selectedYear = selectedDate.year;
+                          int selectedMonth = selectedDate.month;
+                          int selectedDay = selectedDate.day;
+                          DateTime eventDate = DateTime(
+                            selectedYear,
+                            selectedMonth,
+                            selectedDay,
+                            changeHour!,
+                            changeMinute!,
+                          );
                           // share event logic
+                          await getFriendList().then(
+                            (value) {
+                              List<dynamic> friendList = value;
+                              showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                    content: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              10.w, 10.h, 0, 10.h),
+                                          child: Text(
+                                            lang.friend,
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                fontSize: 18.sp,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                        friendList.isEmpty
+                                            ? SizedBox(
+                                                height: 200.h,
+                                                width: double.infinity,
+                                                child: Center(
+                                                  child: Text(
+                                                    lang.empty,
+                                                    style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .secondary
+                                                          .withOpacity(0.6),
+                                                      fontSize: 78.sp,
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            : SizedBox(
+                                                height: 400.h,
+                                                width: 300.w,
+                                                child: Expanded(
+                                                  child: ListView.separated(
+                                                    shrinkWrap: true,
+                                                    physics:
+                                                        const ClampingScrollPhysics(),
+                                                    itemCount:
+                                                        friendList.length,
+                                                    itemBuilder:
+                                                        (BuildContext context,
+                                                            int index) {
+                                                      Map<String, dynamic>
+                                                          firendInfo =
+                                                          friendList[index];
+                                                      String friendName =
+                                                          firendInfo['Name'] ??
+                                                              'anonymous';
+                                                      String friendHashCode =
+                                                          firendInfo[
+                                                                  'HashCode'] ??
+                                                              '#error';
+                                                      String? friendUID =
+                                                          firendInfo['uid'];
+                                                      return IconButton(
+                                                        onPressed: () async {
+                                                          if (friendUID !=
+                                                              null) {
+                                                            //이벤투 공유
+                                                            await shareEvent(
+                                                              date: eventDate,
+                                                              detail:
+                                                                  changeDetail!,
+                                                              uid: friendUID,
+                                                            );
+                                                            Future.microtask(
+                                                                () {
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                SnackBar(
+                                                                  content:
+                                                                      Center(
+                                                                    child: Text(
+                                                                      lang.shareComplete,
+                                                                      style:
+                                                                          TextStyle(
+                                                                        color: Theme.of(context)
+                                                                            .colorScheme
+                                                                            .onSecondary,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  duration:
+                                                                      const Duration(
+                                                                          seconds:
+                                                                              2),
+                                                                  backgroundColor: Theme.of(
+                                                                          context)
+                                                                      .colorScheme
+                                                                      .secondary,
+                                                                ),
+                                                              );
+                                                              Navigator.pop(
+                                                                  context);
+                                                            });
+                                                          }
+                                                        },
+                                                        icon: Container(
+                                                          width:
+                                                              double.infinity,
+                                                          height: 120.h,
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(
+                                                                  10.w,
+                                                                  19.h,
+                                                                  10.w,
+                                                                  19.h),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12.sp),
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .background,
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .black26,
+                                                                blurRadius:
+                                                                    12.sp,
+                                                                offset: Offset(
+                                                                    8.w, 10.h),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text.rich(
+                                                            TextSpan(
+                                                                text:
+                                                                    friendName,
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Theme.of(
+                                                                          context)
+                                                                      .colorScheme
+                                                                      .secondary,
+                                                                  fontSize:
+                                                                      18.sp,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                ),
+                                                                children: [
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          ' '),
+                                                                  TextSpan(
+                                                                    text:
+                                                                        friendHashCode,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Theme.of(
+                                                                              context)
+                                                                          .colorScheme
+                                                                          .secondary,
+                                                                      fontSize:
+                                                                          18.sp,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  )
+                                                                ]),
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    separatorBuilder:
+                                                        (context, index) {
+                                                      return SizedBox(
+                                                          height: 20.h);
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          );
                         },
                         icon: Icon(
                           Icons.share,

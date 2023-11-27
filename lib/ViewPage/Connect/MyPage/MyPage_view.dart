@@ -318,45 +318,47 @@ class _MyPageState extends ConsumerState<MyPage> {
                               Expanded(
                                 child: Text.rich(
                                   TextSpan(
-                                      text: friendName,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                        fontSize: 18.sp,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                      children: [
-                                        const TextSpan(text: ' '),
-                                        TextSpan(
-                                          text: friendHashCode,
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
-                                            fontSize: 18.sp,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        )
-                                      ]),
+                                    text: friendName,
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    children: [
+                                      const TextSpan(text: ' '),
+                                      TextSpan(
+                                        text: friendHashCode,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               IconButton(
-                                  onPressed: () async {
-                                    if (friendUID != null) {
-                                      //친구삭제
-                                      await deleteFriend(friendUID);
-                                      setState(() {});
-                                    }
-                                  },
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
-                                    size: 28.sp,
-                                  ))
+                                onPressed: () async {
+                                  if (friendUID != null) {
+                                    //친구삭제
+                                    await deleteFriend(friendUID);
+                                    setState(() {});
+                                  }
+                                },
+                                icon: Icon(
+                                  Icons.delete,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                  size: 28.sp,
+                                ),
+                              ),
                             ],
                           ),
                         );

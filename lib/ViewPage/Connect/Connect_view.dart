@@ -10,9 +10,8 @@ import 'package:diaryconnect/main.dart';
 import 'package:diaryconnect/CustomIcon.dart';
 import 'package:diaryconnect/Theme/ThemeLanguage.dart';
 import 'MyPage/MyPage_view.dart';
-
-import 'package:diaryconnect/ViewPage/Diary/DiaryWrite_view.dart';
-import 'package:diaryconnect/ViewPage/Calendar/EditEvent_view.dart';
+import 'Calendar/Connect_Event_view.dart';
+import 'Diary/Connect_Diary_view.dart';
 
 class ConnectPage extends ConsumerStatefulWidget {
   const ConnectPage({super.key});
@@ -263,18 +262,23 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                                         selectedDayEvent[index];
                                     DateTime date = event['date'];
                                     String detail = event['detail'];
+                                    String uid = event['uid'];
                                     return IconButton(
                                       onPressed: () async {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => EditEventPage(
+                                            builder: (context) =>
+                                                ViewConnectEventPage(
                                               date: date,
                                               detail: detail,
+                                              uid: uid,
                                             ),
                                           ),
                                         );
-                                        Future.microtask(() => setState(() {}));
+                                        await Future.microtask(() {
+                                          setState(() {});
+                                        });
                                       },
                                       icon: Container(
                                         width: double.infinity,
@@ -300,17 +304,40 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
-                                                    detail,
-                                                    maxLines: 2,
-                                                    style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary,
-                                                      fontSize: 18.sp,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          detail,
+                                                          maxLines: 1,
+                                                          style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .secondary,
+                                                            fontSize: 18.sp,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      if (userUID == uid)
+                                                        Text(
+                                                          lang.me,
+                                                          style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .tertiaryContainer,
+                                                            fontSize: 18.sp,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                          ),
+                                                        )
+                                                    ],
                                                   ),
                                                   Text(
                                                     '${date.hour}:${date.minute < 10 ? 0.toString() + date.minute.toString() : date.minute}',
@@ -350,293 +377,317 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                     color: Theme.of(context).colorScheme.primaryContainer,
                     child: SingleChildScrollView(
                       physics: const ClampingScrollPhysics(),
-                      child: FutureBuilder(
-                        //Get Entries Data from Entries_model
-                        future: getEntries(),
-                        initialData: const [],
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Text('');
-                          }
-                          List<Map<String, dynamic>> myEntries =
-                              snapshot.data.toList();
-                          if (myEntries.isEmpty) {
-                            return Center(
-                              heightFactor: 6,
-                              child: Text(
-                                'NO Entries',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  fontSize: 56.sp,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            );
-                          }
-                          //Entries Page show widget
-                          return ListView.separated(
-                            physics: const BouncingScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: myEntries.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              Map<String, dynamic> thisEntry = myEntries[index];
-                              bool imageExist = false;
-
-                              //current index가 date flag인 경우 return
-                              if (thisEntry['monthFlag'] != null) {
-                                return SizedBox(
-                                  height: 200.h,
-                                  width: double.infinity,
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          '${thisEntry['yearFlag']}.',
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
-                                            fontSize: 18.sp,
-                                          ),
-                                        ),
-                                        Text(
-                                          thisEntry['monthFlag'],
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
-                                            fontSize: 80.sp,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ],
+                      child: Column(
+                        children: [
+                          FutureBuilder(
+                            //Get Entries Data from Entries_model
+                            future: getEntries(),
+                            initialData: const [],
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Text('');
+                              }
+                              List<Map<String, dynamic>> myEntries =
+                                  snapshot.data.toList();
+                              if (myEntries.isEmpty) {
+                                return Center(
+                                  heightFactor: 6,
+                                  child: Text(
+                                    'NO Entries',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      fontSize: 56.sp,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 );
                               }
+                              //Entries Page show widget
+                              return ListView.separated(
+                                physics: const BouncingScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: myEntries.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  Map<String, dynamic> thisEntry =
+                                      myEntries[index];
+                                  bool imageExist = false;
 
-                              final IconData weather =
-                                  weatherIconData(thisEntry['weather']);
-                              final IconData mood =
-                                  moodIconData(thisEntry['mood']);
-                              final DateTime date =
-                                  DateTime.parse(thisEntry['date']);
-                              final String detail = thisEntry['detail'];
-                              final String dayOfWeek =
-                                  DateFormat('E', 'en_US').format(date);
-                              final String image = thisEntry['image'];
-                              final String uid = thisEntry['uid'];
-                              //Image image = Image.memory(base64Decode(thisEntry['image']));
-                              if (image != 'null') {
-                                imageExist = true;
-                              }
-                              Map<String, dynamic> entryData = {
-                                'weather': weather,
-                                'mood': mood,
-                                'date': date,
-                                'detail': detail,
-                                'dayOfWeek': dayOfWeek,
-                                'image': image,
-                              };
-                              return InkWell(
-                                onTap: () async {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          DiaryWritePage(entryData: entryData),
-                                    ),
-                                  );
-                                },
-                                child: Padding(
-                                  //entry side padding
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 10.w),
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: 140.h,
-                                    padding: EdgeInsets.fromLTRB(
-                                        10.w, 19.h, 10.w, 19.h),
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(12.sp),
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .background,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black26,
-                                          blurRadius: 12.sp,
-                                          offset: Offset(8.w, 10.h),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          flex: 2,
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                //일
-                                                Text(
-                                                  '${date.day}',
-                                                  style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary,
-                                                    fontSize: 42.sp,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                                //요일
-                                                Text(
-                                                  '$dayOfWeek.',
-                                                  style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary,
-                                                    fontSize: 14.sp,
-                                                  ),
-                                                ),
-                                              ],
+                                  //current index가 date flag인 경우 return
+                                  if (thisEntry['monthFlag'] != null) {
+                                    return SizedBox(
+                                      height: 200.h,
+                                      width: double.infinity,
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              '${thisEntry['yearFlag']}.',
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                fontSize: 18.sp,
+                                              ),
                                             ),
+                                            Text(
+                                              thisEntry['monthFlag'],
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                fontSize: 80.sp,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  final IconData weather =
+                                      weatherIconData(thisEntry['weather']);
+                                  final IconData mood =
+                                      moodIconData(thisEntry['mood']);
+                                  final DateTime date =
+                                      DateTime.parse(thisEntry['date']);
+                                  final String detail = thisEntry['detail'];
+                                  final String dayOfWeek =
+                                      DateFormat('E', 'en_US').format(date);
+                                  final String image = thisEntry['image'];
+                                  final String uid = thisEntry['uid'];
+                                  //Image image = Image.memory(base64Decode(thisEntry['image']));
+                                  if (image != 'null') {
+                                    imageExist = true;
+                                  }
+                                  Map<String, dynamic> entryData = {
+                                    'weather': weather,
+                                    'mood': mood,
+                                    'date': date,
+                                    'detail': detail,
+                                    'dayOfWeek': dayOfWeek,
+                                    'image': image,
+                                  };
+                                  return InkWell(
+                                    onTap: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ViewConnectDiaryPage(
+                                            entryData: entryData,
+                                            uid: uid,
                                           ),
                                         ),
-                                        Expanded(
-                                          flex: 5,
-                                          child: Container(
-                                            alignment: Alignment.topLeft,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                //시간
-                                                Text.rich(
-                                                  TextSpan(
-                                                      text:
-                                                          '${date.hour}:${date.minute.toString().padLeft(2, '0')}  ',
+                                      );
+                                      await Future.microtask(() {
+                                        setState(() {});
+                                      });
+                                    },
+                                    child: Padding(
+                                      //entry side padding
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w),
+                                      child: Container(
+                                        width: double.infinity,
+                                        height: 140.h,
+                                        padding: EdgeInsets.fromLTRB(
+                                            10.w, 19.h, 10.w, 19.h),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12.sp),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .background,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black26,
+                                              blurRadius: 12.sp,
+                                              offset: Offset(8.w, 10.h),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              flex: 2,
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    //일
+                                                    Text(
+                                                      '${date.day}',
                                                       style: TextStyle(
                                                         color: Theme.of(context)
                                                             .colorScheme
                                                             .secondary,
-                                                        fontSize: 12.sp,
+                                                        fontSize: 42.sp,
+                                                        fontWeight:
+                                                            FontWeight.w700,
                                                       ),
-                                                      children: [
-                                                        if (userUID == uid)
-                                                          TextSpan(
-                                                            text: lang.me,
-                                                            style: TextStyle(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .colorScheme
-                                                                  .tertiaryContainer,
-                                                              fontSize: 12.sp,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                            ),
-                                                          )
-                                                      ]),
-                                                ),
-                                                ConstrainedBox(
-                                                  constraints: BoxConstraints(
-                                                    minHeight: 70.h,
-                                                  ),
-                                                  child: Text(
-                                                    detail,
-                                                    style: TextStyle(
-                                                      color: Colors.black54,
-                                                      fontSize: 16.sp,
-                                                      fontFamily: 'null',
                                                     ),
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                )
-                                                //내용
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 3,
-                                          child: Container(
-                                            alignment: Alignment.topCenter,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    //날씨
-                                                    Icon(
-                                                      weather,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary,
-                                                      size: 28.sp,
-                                                    ),
-                                                    //기분
-                                                    Icon(
-                                                      mood,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary,
-                                                      size: 18.sp,
+                                                    //요일
+                                                    Text(
+                                                      '$dayOfWeek.',
+                                                      style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .secondary,
+                                                        fontSize: 14.sp,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
-                                                //사진 있을 시 파일
-                                                if (imageExist)
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.fromLTRB(
-                                                            0, 0, 12.w, 6.h),
-                                                    child: Icon(
-                                                      CustomIcon.attach,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary,
-                                                      size: 24.sp,
-                                                    ),
-                                                  ),
-                                              ],
+                                              ),
                                             ),
-                                          ),
+                                            Expanded(
+                                              flex: 5,
+                                              child: Container(
+                                                alignment: Alignment.topLeft,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    //시간
+                                                    Text.rich(
+                                                      TextSpan(
+                                                          text:
+                                                              '${date.hour}:${date.minute.toString().padLeft(2, '0')}  ',
+                                                          style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .secondary,
+                                                            fontSize: 12.sp,
+                                                          ),
+                                                          children: [
+                                                            if (userUID == uid)
+                                                              TextSpan(
+                                                                text: lang.me,
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Theme.of(
+                                                                          context)
+                                                                      .colorScheme
+                                                                      .tertiaryContainer,
+                                                                  fontSize:
+                                                                      12.sp,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                ),
+                                                              )
+                                                          ]),
+                                                    ),
+                                                    ConstrainedBox(
+                                                      constraints:
+                                                          BoxConstraints(
+                                                        minHeight: 70.h,
+                                                      ),
+                                                      child: Text(
+                                                        detail,
+                                                        style: TextStyle(
+                                                          color: Colors.black54,
+                                                          fontSize: 16.sp,
+                                                          fontFamily: 'null',
+                                                        ),
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    )
+                                                    //내용
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 3,
+                                              child: Container(
+                                                alignment: Alignment.topCenter,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        //날씨
+                                                        Icon(
+                                                          weather,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .secondary,
+                                                          size: 28.sp,
+                                                        ),
+                                                        //기분
+                                                        Icon(
+                                                          mood,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .secondary,
+                                                          size: 18.sp,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    //사진 있을 시 파일
+                                                    if (imageExist)
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.fromLTRB(
+                                                                0,
+                                                                0,
+                                                                12.w,
+                                                                6.h),
+                                                        child: Icon(
+                                                          CustomIcon.attach,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .secondary,
+                                                          size: 24.sp,
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
+                                separatorBuilder: (context, index) {
+                                  return SizedBox(height: 20.h);
+                                },
                               );
                             },
-                            separatorBuilder: (context, index) {
-                              return SizedBox(height: 18.h);
-                            },
-                          );
-                        },
+                          ),
+                          SizedBox(height: 30.h),
+                        ],
                       ),
                     ),
                   ),

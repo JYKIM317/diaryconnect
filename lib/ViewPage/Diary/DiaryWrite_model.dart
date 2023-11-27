@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'Diarys_model.dart';
 import 'package:diaryconnect/CustomIcon.dart';
@@ -212,4 +214,46 @@ Future<String> getImage() async {
   }
 
   return image;
+}
+
+//다이어리 공유
+Future<void> shareDiary({
+  required IconData weather,
+  required IconData mood,
+  required DateTime date,
+  required String detail,
+  required String image,
+  required String uid,
+}) async {
+  String? userUID = FirebaseAuth.instance.currentUser!.uid;
+  final String weatherString = weatherToString(weather);
+  final String moodString = moodToString(mood);
+
+  final String entryName =
+      '${date.year}.${date.month}.${date.day}_${date.hour}:${date.minute}_$userUID';
+
+  //공유할 때 data의 'date' 는 DateTime 타입의 데이터로 올릴 것
+  Map<String, dynamic> entryData = {
+    'weather': weatherString, //String
+    'mood': moodString, //String
+    'date': date, //DateTime
+    'detail': detail, //String
+    'image': image, //String
+    'uid': userUID, //String
+  };
+
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(uid)
+      .collection('Diary')
+      .doc(entryName)
+      .set(entryData)
+      .then((_) async {
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userUID)
+        .collection('Diary')
+        .doc(entryName)
+        .set(entryData);
+  });
 }

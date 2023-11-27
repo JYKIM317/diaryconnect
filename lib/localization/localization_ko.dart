@@ -22,4 +22,5 @@ class KRLang {
   String noUser = '사용자 없음';
   String requestSucess = '친구 요청 완료';
   String alreadyRequest = '이미 요청한 대상입니다';
+  String shareComplete = '공유 완료';
 }
