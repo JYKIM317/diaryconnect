@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter/material.dart';
 import 'package:diaryconnect/CustomIcon.dart';
@@ -182,4 +183,12 @@ IconData moodIconData(String mood) {
       loadIconData = CustomIcon.emo_happy;
   }
   return loadIconData;
+}
+
+//uid로 닉네임 가져오기
+Future<String?> getFriendName(String uid) async {
+  String? name;
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  name = prefs.getString(uid);
+  return name;
 }

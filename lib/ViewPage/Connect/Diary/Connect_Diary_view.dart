@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:diaryconnect/main.dart';
 import 'Connect_Diary_model.dart';
+import 'package:diaryconnect/ViewPage/Connect/Connect_model.dart';
 
 class ViewConnectDiaryPage extends ConsumerStatefulWidget {
   final Map<String, dynamic> entryData;
@@ -205,8 +206,28 @@ class _ViewConnectDiaryPageState extends ConsumerState<ViewConnectDiaryPage> {
               width: double.infinity,
               padding: EdgeInsets.fromLTRB(0, 24.h, 10.w, 0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 20.w),
+                    child: FutureBuilder(
+                        future: getFriendName(uid),
+                        initialData: '',
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          String name = snapshot.data ?? '';
+                          return Text(
+                            name,
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .secondary
+                                  .withOpacity(0.8),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          );
+                        }),
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -216,11 +237,6 @@ class _ViewConnectDiaryPageState extends ConsumerState<ViewConnectDiaryPage> {
                         size: 28.sp,
                       ),
                       SizedBox(width: 16.w),
-                    ],
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
                       Icon(
                         mood,
                         color: Theme.of(context).colorScheme.secondary,

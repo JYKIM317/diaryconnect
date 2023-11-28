@@ -1,10 +1,11 @@
-import 'package:diaryconnect/ViewPage/Connect/Calendar/Connect_Event_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:diaryconnect/main.dart';
+import 'package:diaryconnect/ViewPage/Connect/Calendar/Connect_Event_model.dart';
+import 'package:diaryconnect/ViewPage/Connect/Connect_model.dart';
 
 class ViewConnectEventPage extends ConsumerStatefulWidget {
   final DateTime date;
@@ -138,6 +139,24 @@ class _ViewConnectEventPageState extends ConsumerState<ViewConnectEventPage> {
             ),
           )
         ],
+        title: userUID != uid
+            //local에서 작성자 uid로 name가져오기
+            ? FutureBuilder(
+                future: getFriendName(uid),
+                initialData: '',
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  String name = snapshot.data ?? '';
+                  return Text(
+                    name,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  );
+                },
+              )
+            : null,
+        centerTitle: true,
       ),
       body: GestureDetector(
         onTap: () {

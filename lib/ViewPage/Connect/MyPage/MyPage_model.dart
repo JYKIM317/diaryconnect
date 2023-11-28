@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<Map<String, dynamic>> getMyData() async {
   Map<String, dynamic> myData = {};
@@ -29,6 +30,7 @@ Future<Map<String, dynamic>> getMyData() async {
 
 Future<List<Map<String, dynamic>>> getFriendList() async {
   List<Map<String, dynamic>> friendList = [];
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   String? userUID = FirebaseAuth.instance.currentUser!.uid;
   final dataFromFirebase = await FirebaseFirestore.instance
       .collection('Users')
@@ -46,6 +48,8 @@ Future<List<Map<String, dynamic>>> getFriendList() async {
           .get();
       Map<String, dynamic>? friendData = firendInfo.data();
       if (friendData != null) {
+        await prefs.setString(friendData['uid'],
+            '${friendData['Name']}${friendData['HashCode']}');
         friendList.add(friendData);
       }
     }
