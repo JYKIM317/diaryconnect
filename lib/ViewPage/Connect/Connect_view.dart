@@ -311,7 +311,7 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                                                       Expanded(
                                                         child: Text(
                                                           detail,
-                                                          maxLines: 1,
+                                                          maxLines: 2,
                                                           style: TextStyle(
                                                             color: Theme.of(
                                                                     context)
