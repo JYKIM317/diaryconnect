@@ -340,7 +340,7 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                                                     ],
                                                   ),
                                                   Text(
-                                                    '${date.hour}:${date.minute < 10 ? 0.toString() + date.minute.toString() : date.minute}',
+                                                    '${date.hour}:${date.minute.toString().padLeft(2, '0')}',
                                                     style: TextStyle(
                                                       color: Theme.of(context)
                                                           .colorScheme

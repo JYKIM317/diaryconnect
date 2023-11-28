@@ -238,7 +238,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                                     ),
                                   ),
                                   Text(
-                                    '${date.hour}:${date.minute < 10 ? 0.toString() + date.minute.toString() : date.minute}',
+                                    '${date.hour}:${date.minute.toString().padLeft(2, '0')}',
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme

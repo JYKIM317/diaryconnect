@@ -150,7 +150,7 @@ class _ViewConnectDiaryPageState extends ConsumerState<ViewConnectDiaryPage> {
           )
         ],
         title: Text(
-          '${date.year}.${date.month}.${date.day} $dayOfWeek. ${date.hour}:${date.minute}',
+          '${date.year}.${date.month}.${date.day} $dayOfWeek. ${date.hour}:${date.minute.toString().padLeft(2, '0')}',
           style: TextStyle(
             color: Theme.of(context).colorScheme.secondary,
             fontSize: isDateShow ? 0 : 18.sp,
@@ -190,7 +190,7 @@ class _ViewConnectDiaryPageState extends ConsumerState<ViewConnectDiaryPage> {
                       ),
                     ),
                     Text(
-                      '$dayOfWeek. ${date.hour}:${date.minute}',
+                      '$dayOfWeek. ${date.hour}:${date.minute.toString().padLeft(2, '0')}',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.secondary,
                         fontSize: 14.sp,
