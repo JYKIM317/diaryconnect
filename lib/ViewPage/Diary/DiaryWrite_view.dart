@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bottom_drawer/bottom_drawer.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'dart:io';
 
 import 'DiaryWrite_model.dart';
 import 'package:diaryconnect/main.dart';
 import 'package:diaryconnect/CustomIcon.dart';
 import 'package:diaryconnect/imoticon.dart';
 import 'package:diaryconnect/ViewPage/Connect/MyPage/MyPage_model.dart';
+import 'package:diaryconnect/Admob_adversting.dart';
 
 /*
  받아오는 data
@@ -33,8 +36,6 @@ import 'package:diaryconnect/ViewPage/Connect/MyPage/MyPage_model.dart';
   }
 */
 
-/// create a bottom drawer controller to control the drawer.
-
 class DiaryWritePage extends ConsumerStatefulWidget {
   final Map<String, dynamic> entryData;
   const DiaryWritePage({super.key, required this.entryData});
@@ -44,6 +45,25 @@ class DiaryWritePage extends ConsumerStatefulWidget {
 }
 
 class _DiaryWritePageState extends ConsumerState<DiaryWritePage> {
+  InterstitialAd? _interstitialAd;
+  void interstitialAd() {
+    InterstitialAd.load(
+      adUnitId: Platform.isAndroid
+          ? InterstitialAdId().android
+          : InterstitialAdId().ios,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          debugPrint('$ad loaded');
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint('$error');
+        },
+      ),
+    );
+  }
+
   late IconData weather, mood;
   late DateTime date;
   late String detail, dayOfWeek, image;
@@ -360,6 +380,8 @@ class _DiaryWritePageState extends ConsumerState<DiaryWritePage> {
     scrollController.addListener(() {
       onScroll();
     });
+    interstitialAd();
+
     super.initState();
   }
 
@@ -367,6 +389,7 @@ class _DiaryWritePageState extends ConsumerState<DiaryWritePage> {
   void dispose() {
     overlayEntry?.remove();
     scrollController.dispose();
+    _interstitialAd?.dispose();
     super.dispose();
   }
 
@@ -784,6 +807,12 @@ class _DiaryWritePageState extends ConsumerState<DiaryWritePage> {
                                                     return IconButton(
                                                       onPressed: () async {
                                                         if (friendUID != null) {
+                                                          //전면광고 게재
+                                                          if (_interstitialAd !=
+                                                              null) {
+                                                            _interstitialAd
+                                                                ?.show();
+                                                          }
                                                           //다이어리 공유
                                                           await shareDiary(
                                                               weather: weather,

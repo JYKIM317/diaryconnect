@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'dart:io';
 
 import 'package:diaryconnect/main.dart';
 import 'EditEvent_model.dart';
 import 'package:diaryconnect/ViewPage/Connect/MyPage/MyPage_model.dart';
+import 'package:diaryconnect/Admob_adversting.dart';
 
 class EditEventPage extends ConsumerStatefulWidget {
   final DateTime date;
@@ -16,6 +19,25 @@ class EditEventPage extends ConsumerStatefulWidget {
 }
 
 class _EditEventPageState extends ConsumerState<EditEventPage> {
+  InterstitialAd? _interstitialAd;
+  void interstitialAd() {
+    InterstitialAd.load(
+      adUnitId: Platform.isAndroid
+          ? InterstitialAdId().android
+          : InterstitialAdId().ios,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          debugPrint('$ad loaded');
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint('$error');
+        },
+      ),
+    );
+  }
+
   late DateTime selectedDate;
   late int hour, minute;
   late String detail;
@@ -35,12 +57,14 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
     changeMinute = minute;
     changeDetail = detail;
     eventDetailController.text = detail;
+    interstitialAd();
     super.initState();
   }
 
   @override
   void dispose() {
     eventDetailController.dispose();
+    _interstitialAd?.dispose();
     super.dispose();
   }
 
@@ -495,7 +519,13 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                                                         onPressed: () async {
                                                           if (friendUID !=
                                                               null) {
-                                                            //이벤투 공유
+                                                            //전면광고 게재
+                                                            if (_interstitialAd !=
+                                                                null) {
+                                                              _interstitialAd
+                                                                  ?.show();
+                                                            }
+                                                            //이벤트 공유
                                                             await shareEvent(
                                                               date: eventDate,
                                                               detail:

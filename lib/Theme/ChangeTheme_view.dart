@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'dart:io';
 
 import 'package:diaryconnect/main.dart';
 import 'ThemeLanguage.dart';
+import 'package:diaryconnect/Admob_adversting.dart';
 
 class ChangeThemePage extends ConsumerStatefulWidget {
   const ChangeThemePage({super.key});
@@ -14,6 +17,37 @@ class ChangeThemePage extends ConsumerStatefulWidget {
 }
 
 class _ChangeThemePageState extends ConsumerState<ChangeThemePage> {
+  InterstitialAd? _interstitialAd;
+  void interstitialAd() {
+    InterstitialAd.load(
+      adUnitId: Platform.isAndroid
+          ? InterstitialAdId().android
+          : InterstitialAdId().ios,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          debugPrint('$ad loaded');
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint('$error');
+        },
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    interstitialAd();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _interstitialAd?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final lang = ref.watch(themeLang);
@@ -44,6 +78,9 @@ class _ChangeThemePageState extends ConsumerState<ChangeThemePage> {
                   child: IconButton(
                       onPressed: () {
                         ref.read(themeColor.notifier).red();
+                        if (_interstitialAd != null) {
+                          _interstitialAd?.show();
+                        }
                       },
                       icon: Icon(
                         ref.watch(themeColor) == Colors.red
@@ -57,6 +94,9 @@ class _ChangeThemePageState extends ConsumerState<ChangeThemePage> {
                   child: IconButton(
                       onPressed: () {
                         ref.read(themeColor.notifier).deepPurple();
+                        if (_interstitialAd != null) {
+                          _interstitialAd?.show();
+                        }
                       },
                       icon: Icon(
                         ref.watch(themeColor) == Colors.deepPurple
@@ -70,6 +110,9 @@ class _ChangeThemePageState extends ConsumerState<ChangeThemePage> {
                   child: IconButton(
                     onPressed: () {
                       ref.read(themeColor.notifier).indigo();
+                      if (_interstitialAd != null) {
+                        _interstitialAd?.show();
+                      }
                     },
                     icon: Icon(
                       ref.watch(themeColor) == Colors.indigo
@@ -84,6 +127,9 @@ class _ChangeThemePageState extends ConsumerState<ChangeThemePage> {
                   child: IconButton(
                       onPressed: () {
                         ref.read(themeColor.notifier).lightBlue();
+                        if (_interstitialAd != null) {
+                          _interstitialAd?.show();
+                        }
                       },
                       icon: Icon(
                         ref.watch(themeColor) == Colors.lightBlue
@@ -98,6 +144,9 @@ class _ChangeThemePageState extends ConsumerState<ChangeThemePage> {
             IconButton(
               onPressed: () {
                 ref.read(themeColor.notifier).green();
+                if (_interstitialAd != null) {
+                  _interstitialAd?.show();
+                }
               },
               icon: Icon(
                 ref.watch(themeColor) == Colors.green
@@ -124,6 +173,9 @@ class _ChangeThemePageState extends ConsumerState<ChangeThemePage> {
               onPressed: () {
                 if (languageCode != 'en_US') {
                   ref.read(themeLang.notifier).setEn();
+                  if (_interstitialAd != null) {
+                    _interstitialAd?.show();
+                  }
                 }
               },
               icon: Container(
@@ -160,6 +212,9 @@ class _ChangeThemePageState extends ConsumerState<ChangeThemePage> {
               onPressed: () {
                 if (languageCode != 'ko_KR') {
                   ref.read(themeLang.notifier).setKo();
+                  if (_interstitialAd != null) {
+                    _interstitialAd?.show();
+                  }
                 }
               },
               icon: Container(
@@ -196,6 +251,9 @@ class _ChangeThemePageState extends ConsumerState<ChangeThemePage> {
               onPressed: () {
                 if (languageCode != 'ja_JP') {
                   ref.read(themeLang.notifier).setJa();
+                  if (_interstitialAd != null) {
+                    _interstitialAd?.show();
+                  }
                 }
               },
               icon: Container(

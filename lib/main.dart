@@ -10,6 +10,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'Theme/ThemeColor.dart';
 import 'Theme/ThemeLanguage.dart';
@@ -99,6 +101,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   //Firebase auth login
   await FirebaseAuth.instance.signInAnonymously();
+  await MobileAds.instance.initialize();
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final bool? firstLogin = prefs.getBool('firstLogin');
   String? userUID = FirebaseAuth.instance.currentUser!.uid;
@@ -166,6 +169,25 @@ class MainPage extends ConsumerStatefulWidget {
 }
 
 class _MainPageState extends ConsumerState<MainPage> {
+  //app_tracking_transparency
+
+  Future<void> initPlugin() async {
+    try {
+      final TrackingStatus status =
+          await AppTrackingTransparency.trackingAuthorizationStatus;
+      if (status == TrackingStatus.notDetermined) {
+        await Future.delayed(const Duration(milliseconds: 200));
+        final TrackingStatus status =
+            await AppTrackingTransparency.requestTrackingAuthorization();
+        debugPrint(status.toString());
+      }
+    } on PlatformException {
+      debugPrint('PlatformException was thrown');
+    }
+
+    //final uuid = await AppTrackingTransparency.getAdvertisingIdentifier();
+  }
+
   //scaffold body page number
   int selectedIndex = 1;
   //page change
@@ -175,6 +197,13 @@ class _MainPageState extends ConsumerState<MainPage> {
         selectedIndex = index;
       });
     }
+  }
+
+  @override
+  void initState() {
+    //call initPlugin after painting build
+    WidgetsBinding.instance.addPostFrameCallback((_) => initPlugin());
+    super.initState();
   }
 
   @override
