@@ -2,8 +2,11 @@ import 'package:diaryconnect/ViewPage/Connect/MyPage/AddFriend_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'dart:io';
 
 import 'package:diaryconnect/main.dart';
+import 'package:diaryconnect/Admob_adversting.dart';
 
 class AddFriendPage extends ConsumerStatefulWidget {
   const AddFriendPage({super.key});
@@ -13,9 +16,41 @@ class AddFriendPage extends ConsumerStatefulWidget {
 }
 
 class _AddFriendPageState extends ConsumerState<AddFriendPage> {
+  InterstitialAd? _interstitialAd;
+  void interstitialAd() {
+    InterstitialAd.load(
+      adUnitId: Platform.isAndroid
+          ? InterstitialAdId().android
+          : InterstitialAdId().ios,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          debugPrint('$ad loaded');
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint('$error');
+        },
+      ),
+    );
+  }
+
   final TextEditingController searchController = TextEditingController();
   String? searchValue;
   bool pageState = true;
+
+  @override
+  void initState() {
+    interstitialAd();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _interstitialAd?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final lang = ref.watch(themeLang);
@@ -274,6 +309,11 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                           IconButton(
                                             onPressed: () async {
                                               if (searchUserUID != null) {
+                                                //전면광고 게재
+                                                if (_interstitialAd != null) {
+                                                  _interstitialAd?.show();
+                                                }
+                                                //친구 요청
                                                 bool requestResult =
                                                     await requestFriend(
                                                         searchUserUID);
