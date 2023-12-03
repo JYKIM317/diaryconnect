@@ -164,6 +164,12 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                Icon(
+                                  Icons.search,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                  size: 24.sp,
+                                ),
                                 Expanded(
                                   //친구 찾기
                                   child: TextField(
@@ -185,12 +191,6 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                           .secondary,
                                     ),
                                   ),
-                                ),
-                                Icon(
-                                  Icons.search,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  size: 24.sp,
                                 ),
                               ],
                             ),
