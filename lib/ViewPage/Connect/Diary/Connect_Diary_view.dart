@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:diaryconnect/main.dart';
 import 'Connect_Diary_model.dart';
 import 'package:diaryconnect/ViewPage/Connect/Connect_model.dart';
+import 'package:diaryconnect/Function_callback_control.dart';
 
 class ViewConnectDiaryPage extends ConsumerStatefulWidget {
   final Map<String, dynamic> entryData;
@@ -24,6 +25,7 @@ class _ViewConnectDiaryPageState extends ConsumerState<ViewConnectDiaryPage> {
   late DateTime date;
   late String detail, dayOfWeek, image, uid;
   final TextEditingController editingController = TextEditingController();
+  Throttle throttle = Throttle(delay: Duration(milliseconds: 300));
 
   String? userUID = FirebaseAuth.instance.currentUser!.uid;
 
@@ -114,7 +116,7 @@ class _ViewConnectDiaryPageState extends ConsumerState<ViewConnectDiaryPage> {
                             ),
                           ),
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            Navigator.pop(context);
                           },
                         ),
                         TextButton(
@@ -129,10 +131,11 @@ class _ViewConnectDiaryPageState extends ConsumerState<ViewConnectDiaryPage> {
                             //커넥트 다이어리 삭제 로직
                             String eventName =
                                 "${date.year}.${date.month}.${date.day}_${date.hour}:${date.minute}_$uid";
-                            await deleteConnectDiary(eventName);
-                            Future.microtask(() {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
+                            throttle.run(() async {
+                              await deleteConnectDiary(eventName).then((_) {
+                                Navigator.pop(context);
+                                Navigator.pop(context, true);
+                              });
                             });
                           },
                         ),

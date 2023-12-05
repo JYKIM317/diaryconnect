@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:diaryconnect/main.dart';
 import 'package:diaryconnect/Admob_adversting.dart';
+import 'package:diaryconnect/Function_callback_control.dart';
 
 class AddFriendPage extends ConsumerStatefulWidget {
   const AddFriendPage({super.key});
@@ -35,6 +36,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
     );
   }
 
+  Throttle throttle = Throttle(delay: Duration(milliseconds: 300));
   final TextEditingController searchController = TextEditingController();
   String? searchValue;
   bool pageState = true;
@@ -313,13 +315,16 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                                 if (_interstitialAd != null) {
                                                   _interstitialAd?.show();
                                                 }
+                                                bool? requestResult;
                                                 //친구 요청
-                                                bool requestResult =
-                                                    await requestFriend(
-                                                        searchUserUID);
+                                                throttle.run(() async {
+                                                  requestResult =
+                                                      await requestFriend(
+                                                          searchUserUID);
+                                                });
                                                 Future.microtask(
                                                   () {
-                                                    requestResult
+                                                    requestResult ?? false
                                                         //친구 요청이 정상적으로 수행 된 경우
                                                         ? ScaffoldMessenger.of(
                                                                 context)
@@ -497,8 +502,10 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                           onPressed: () async {
                                             if (requestUserUID != null) {
                                               //요청 수락
-                                              await acceptRequest(
-                                                  requestUserUID);
+                                              throttle.run(() async {
+                                                await acceptRequest(
+                                                    requestUserUID);
+                                              });
                                               setState(() {});
                                             }
                                           },
@@ -514,8 +521,10 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                           onPressed: () async {
                                             if (requestUserUID != null) {
                                               //요청 거절
-                                              await deniedRequest(
-                                                  requestUserUID);
+                                              throttle.run(() async {
+                                                await deniedRequest(
+                                                    requestUserUID);
+                                              });
                                               setState(() {});
                                             }
                                           },

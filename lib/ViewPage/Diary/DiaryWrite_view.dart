@@ -775,7 +775,7 @@ class _DiaryWritePageState extends ConsumerState<DiaryWritePage> {
                                                         .colorScheme
                                                         .secondary
                                                         .withOpacity(0.6),
-                                                    fontSize: 78.sp,
+                                                    fontSize: 56.sp,
                                                   ),
                                                 ),
                                               ),

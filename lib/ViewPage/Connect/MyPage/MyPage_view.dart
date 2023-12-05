@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'MyPage_model.dart';
 import 'AddFriend_view.dart';
 import 'package:diaryconnect/main.dart';
+import 'package:diaryconnect/Function_callback_control.dart';
 
 class MyPage extends ConsumerStatefulWidget {
   const MyPage({super.key});
@@ -18,6 +19,8 @@ class MyPage extends ConsumerStatefulWidget {
 class _MyPageState extends ConsumerState<MyPage> {
   final TextEditingController nameController = TextEditingController();
   String? userUID = FirebaseAuth.instance.currentUser!.uid;
+
+  Throttle throttle = Throttle(delay: Duration(milliseconds: 300));
   @override
   Widget build(BuildContext context) {
     final lang = ref.watch(themeLang);
@@ -205,8 +208,10 @@ class _MyPageState extends ConsumerState<MyPage> {
                                                           .pop();
                                                     } else {
                                                       //firebase에 저장하는 로직
-                                                      await modifyMyName(
-                                                          modifyName);
+                                                      throttle.run(() async {
+                                                        await modifyMyName(
+                                                            modifyName);
+                                                      });
                                                       Future.microtask(() {
                                                         Navigator.pop(context);
                                                         setState(() {});
@@ -348,7 +353,9 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 onPressed: () async {
                                   if (friendUID != null) {
                                     //친구삭제
-                                    await deleteFriend(friendUID);
+                                    throttle.run(() async {
+                                      await deleteFriend(friendUID);
+                                    });
                                     setState(() {});
                                   }
                                 },

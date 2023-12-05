@@ -25,8 +25,8 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
   DateTime _focusedDay = DateTime.now();
   final CalendarFormat _calendarFormat = CalendarFormat.month;
   String? userUID = FirebaseAuth.instance.currentUser!.uid;
-
   bool pageState = true;
+
   @override
   Widget build(BuildContext context) {
     final lang = ref.watch(themeLang);
@@ -275,9 +275,10 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                                               uid: uid,
                                             ),
                                           ),
-                                        );
-                                        await Future.microtask(() {
-                                          setState(() {});
+                                        ).then((delete) {
+                                          if (delete) {
+                                            setState(() {});
+                                          }
                                         });
                                       },
                                       icon: Container(
@@ -485,9 +486,10 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                                             uid: uid,
                                           ),
                                         ),
-                                      );
-                                      await Future.microtask(() {
-                                        setState(() {});
+                                      ).then((delete) {
+                                        if (delete) {
+                                          setState(() {});
+                                        }
                                       });
                                     },
                                     child: Padding(

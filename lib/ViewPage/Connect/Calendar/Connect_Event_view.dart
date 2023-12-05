@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:diaryconnect/main.dart';
 import 'package:diaryconnect/ViewPage/Connect/Calendar/Connect_Event_model.dart';
 import 'package:diaryconnect/ViewPage/Connect/Connect_model.dart';
+import 'package:diaryconnect/Function_callback_control.dart';
 
 class ViewConnectEventPage extends ConsumerStatefulWidget {
   final DateTime date;
@@ -31,6 +32,7 @@ class _ViewConnectEventPageState extends ConsumerState<ViewConnectEventPage> {
 
   String? userUID = FirebaseAuth.instance.currentUser!.uid;
   TextEditingController eventDetailController = TextEditingController();
+  Throttle throttle = Throttle(delay: Duration(milliseconds: 300));
 
   int? changeHour, changeMinute;
   String? changeDetail;
@@ -114,14 +116,15 @@ class _ViewConnectEventPageState extends ConsumerState<ViewConnectEventPage> {
                           ),
                           onPressed: () async {
                             //커넥트 이벤트 삭제 로직
-                            await deleteConnectEvent(
-                              date: selectedDate,
-                              detail: detail,
-                              uid: uid,
-                            );
-                            Future.microtask(() {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
+                            throttle.run(() async {
+                              await deleteConnectEvent(
+                                date: selectedDate,
+                                detail: detail,
+                                uid: uid,
+                              ).then((_) {
+                                Navigator.pop(context);
+                                Navigator.pop(context, true);
+                              });
                             });
                           },
                         ),
