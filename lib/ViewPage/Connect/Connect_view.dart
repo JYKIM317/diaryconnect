@@ -383,12 +383,19 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
                           FutureBuilder(
                             //Get Entries Data from Entries_model
                             future: getEntries(),
-                            initialData: const [],
+                            //initialData: const [],
                             builder:
                                 (BuildContext context, AsyncSnapshot snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return const Text('');
+                                return SizedBox(
+                                  height: 400.h,
+                                  child: Center(
+                                      child: CircularProgressIndicator(
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  )),
+                                );
                               }
                               List<Map<String, dynamic>> myEntries =
                                   snapshot.data.toList();
