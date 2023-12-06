@@ -12,6 +12,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'Theme/ThemeColor.dart';
 import 'Theme/ThemeLanguage.dart';
@@ -103,9 +104,10 @@ void main() async {
   await FirebaseAuth.instance.signInAnonymously();
   await MobileAds.instance.initialize();
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final connectivityResult = await Connectivity().checkConnectivity();
   final bool? firstLogin = prefs.getBool('firstLogin');
   String? userUID = FirebaseAuth.instance.currentUser!.uid;
-
+  print(connectivityResult);
   //Calendar locale init initialize
   await initializeDateFormatting();
   if (firstLogin == null) {
@@ -119,15 +121,19 @@ void main() async {
     final String hashcode = userUID.substring(0, 4) +
         userUID.substring(13, 15) +
         userUID.substring(27, 28);
-    await FirebaseFirestore.instance.collection('Users').doc(userUID).set({
-      'Name': 'anonymous',
-      'HashCode': '#$hashcode',
-      'uid': userUID,
+    if (connectivityResult != ConnectivityResult.none) {
+      await FirebaseFirestore.instance.collection('Users').doc(userUID).set({
+        'Name': 'anonymous',
+        'HashCode': '#$hashcode',
+        'uid': userUID,
+      });
+    }
+  }
+  if (connectivityResult != ConnectivityResult.none) {
+    await FirebaseFirestore.instance.collection('Users').doc(userUID).update({
+      'LastLogin': DateTime.now(),
     });
   }
-  await FirebaseFirestore.instance.collection('Users').doc(userUID).update({
-    'LastLogin': DateTime.now(),
-  });
   language = prefs.getString('language') ?? defaultLocale;
   appTheme = prefs.getString('themeColor') ?? 'indigo';
 
