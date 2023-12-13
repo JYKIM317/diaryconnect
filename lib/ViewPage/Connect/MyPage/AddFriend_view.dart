@@ -172,6 +172,7 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                       Theme.of(context).colorScheme.secondary,
                                   size: 24.sp,
                                 ),
+                                SizedBox(width: 10.w),
                                 Expanded(
                                   //친구 찾기
                                   child: TextField(
@@ -504,9 +505,11 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                               //요청 수락
                                               throttle.run(() async {
                                                 await acceptRequest(
-                                                    requestUserUID);
+                                                        requestUserUID)
+                                                    .then((_) {
+                                                  setState(() {});
+                                                });
                                               });
-                                              setState(() {});
                                             }
                                           },
                                           icon: Icon(
@@ -523,9 +526,11 @@ class _AddFriendPageState extends ConsumerState<AddFriendPage> {
                                               //요청 거절
                                               throttle.run(() async {
                                                 await deniedRequest(
-                                                    requestUserUID);
+                                                        requestUserUID)
+                                                    .then((_) {
+                                                  setState(() {});
+                                                });
                                               });
-                                              setState(() {});
                                             }
                                           },
                                           icon: Icon(

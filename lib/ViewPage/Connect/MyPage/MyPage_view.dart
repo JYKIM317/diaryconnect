@@ -210,11 +210,12 @@ class _MyPageState extends ConsumerState<MyPage> {
                                                       //firebase에 저장하는 로직
                                                       throttle.run(() async {
                                                         await modifyMyName(
-                                                            modifyName);
-                                                      });
-                                                      Future.microtask(() {
-                                                        Navigator.pop(context);
-                                                        setState(() {});
+                                                                modifyName)
+                                                            .then((_) {
+                                                          Navigator.pop(
+                                                              context);
+                                                          setState(() {});
+                                                        });
                                                       });
                                                     }
                                                   },
@@ -354,9 +355,10 @@ class _MyPageState extends ConsumerState<MyPage> {
                                   if (friendUID != null) {
                                     //친구삭제
                                     throttle.run(() async {
-                                      await deleteFriend(friendUID);
+                                      await deleteFriend(friendUID).then((_) {
+                                        setState(() {});
+                                      });
                                     });
-                                    setState(() {});
                                   }
                                 },
                                 icon: Icon(
